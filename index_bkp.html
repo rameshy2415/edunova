@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduNova — School Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Instrument Serif', 'Georgia', 'serif'],
+            sans: ['DM Sans', 'sans-serif'],
+          },
+          colors: {
+            ink: '#0D0F12',
+            parchment: '#F8F5EF',
+            gold: '#C9952A',
+            'gold-light': '#F0D48A',
+            cobalt: '#1B3F8B',
+            'cobalt-light': '#E8EEF9',
+            sage: '#3A6B4F',
+            'sage-light': '#E4F0E9',
+            rose: '#A0334A',
+            'rose-light': '#F5E4E8',
+            amber: '#B85C1A',
+            'amber-light': '#FAE8D8',
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.6s ease forwards',
+            'fade-in': 'fadeIn 0.5s ease forwards',
+            'slide-in': 'slideIn 0.4s ease forwards',
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeUp: { '0%': { opacity: 0, transform: 'translateY(24px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
+            fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
+            slideIn: { '0%': { opacity: 0, transform: 'translateX(-16px)' }, '100%': { opacity: 1, transform: 'translateX(0)' } },
+            float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'DM Sans', sans-serif; background: #F8F5EF; color: #0D0F12; }
+    .grain {
+      position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .hero-grid {
+      background-image: linear-gradient(rgba(201,149,42,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,149,42,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .text-balance { text-wrap: balance; }
+    ::-webkit-scrollbar { width: 6px; } 
+    ::-webkit-scrollbar-track { background: #F8F5EF; }
+    ::-webkit-scrollbar-thumb { background: #C9952A; border-radius: 3px; }
+    .dash-scroll::-webkit-scrollbar { width: 4px; }
+    .dash-scroll::-webkit-scrollbar-thumb { background: #e2ddd5; border-radius: 2px; }
+    input[type=password], input[type=text], input[type=email] {
+      outline: none;
+    }
+    .nav-link { position: relative; }
+    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1.5px; background: #C9952A; transition: width 0.3s ease; }
+    .nav-link:hover::after { width: 100%; }
+    .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .sidebar-item { transition: all 0.15s ease; }
+    .feature-card { transition: all 0.25s ease; }
+    .feature-card:hover { transform: translateY(-4px); }
+    .delay-1 { animation-delay: 0.1s; opacity: 0; }
+    .delay-2 { animation-delay: 0.2s; opacity: 0; }
+    .delay-3 { animation-delay: 0.3s; opacity: 0; }
+    .delay-4 { animation-delay: 0.4s; opacity: 0; }
+    .delay-5 { animation-delay: 0.5s; opacity: 0; }
+  </style>
+</head>
+<body>
+<div class="grain"></div>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* ─── Icons (inline SVG) ─── */
+const Icon = ({ name, cls = "w-5 h-5" }) => {
+  const icons = {
+    dashboard: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>,
+    students: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><circle cx="8" cy="7" r="4"/><path d="M2 21c0-4 2.69-7 6-7s6 3 6 7"/><path d="M17 11l2 2 4-4"/></svg>,
+    timetable: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 2v3M16 2v3M3 10h18"/></svg>,
+    attendance: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M9 11l3 3L22 4"/><path d="M20 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>,
+    exams: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M3 6h18M3 12h18M3 18h11"/><path d="M17 14l2 2 4-4"/></svg>,
+    teachers: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3.31 3.58-6 8-6s8 2.69 8 6"/></svg>,
+    fees: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>,
+    reports: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h11v4H3z"/></svg>,
+    settings: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
+    bell: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>,
+    logout: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>,
+    menu: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
+    close: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    check: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><polyline points="20 6 9 17 4 12"/></svg>,
+    arrow: <svg class={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+    star: <svg class={cls} viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  };
+  return icons[name] || null;
+};
+
+/* ─── PUBLIC HOMEPAGE ─── */
+const Homepage = ({ onLogin }) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const features = [
+    { icon: 'students', color: 'cobalt', label: 'Student Records', desc: 'Comprehensive profiles, academic history, and guardian contact in one place.' },
+    { icon: 'attendance', color: 'sage', label: 'Smart Attendance', desc: 'One-click daily marking with auto-generated absence alerts to parents.' },
+    { icon: 'exams', color: 'rose', label: 'Exams & Grades', desc: 'Publish results, auto-calculate grades, and share report cards instantly.' },
+    { icon: 'timetable', color: 'cobalt', label: 'Timetable Builder', desc: 'Drag-and-drop scheduling that avoids conflicts and balances teacher load.' },
+    { icon: 'fees', color: 'amber', label: 'Fee Management', desc: 'Collect online, track dues, issue receipts, and auto-send reminders.' },
+    { icon: 'reports', color: 'sage', label: 'Rich Analytics', desc: 'Board-ready reports on performance, finance, and attendance trends.' },
+  ];
+
+  const stats = [
+    { val: '1,200+', label: 'Schools trust EduNova' },
+    { val: '4.8★', label: 'Average rating' },
+    { val: '99.9%', label: 'Uptime guarantee' },
+    { val: '24/7', label: 'Support available' },
+  ];
+
+  const testimonials = [
+    { name: 'Meera Iyer', role: 'Principal, Sunrise Academy', quote: 'Fee collection went from a monthly headache to fully automated. Our parents love the instant receipts.' },
+    { name: 'Rajesh Nair', role: 'Admin Head, Delhi Public School', quote: 'The timetable builder alone saved us 3 days every semester. Absolutely worth it.' },
+    { name: 'Sunita Patel', role: 'Director, Bhavans Group', quote: 'We manage 8 campuses through one dashboard. The analytics are exceptional.' },
+  ];
+
+  const colorMap = { cobalt: 'bg-cobalt-light text-cobalt', sage: 'bg-sage-light text-sage', rose: 'bg-rose-light text-rose', amber: 'bg-amber-light text-amber' };
+
+  return (
+    <div class="min-h-screen bg-parchment overflow-x-hidden">
+      {/* NAV */}
+      <header class={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-parchment/95 backdrop-blur border-b border-gold/20 shadow-sm' : ''}`}>
+        <div class="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-cobalt rounded-lg flex items-center justify-center">
+              <span class="text-white font-serif text-sm font-bold">E</span>
+            </div>
+            <span class="font-serif text-xl text-ink">EduNova</span>
+          </div>
+          <nav class="hidden md:flex items-center gap-8">
+            {['Features', 'Pricing', 'About', 'Contact'].map(n => (
+              <a key={n} href="#" class="nav-link text-sm font-medium text-ink/70 hover:text-ink transition-colors">{n}</a>
+            ))}
+          </nav>
+          <div class="hidden md:flex items-center gap-3">
+            <button onClick={onLogin} class="text-sm font-medium text-ink/70 hover:text-ink px-4 py-2 rounded-lg hover:bg-ink/5 transition-all">Sign in</button>
+            <button onClick={onLogin} class="text-sm font-medium bg-cobalt text-white px-5 py-2 rounded-lg hover:bg-cobalt/90 transition-all shadow-sm">Get started →</button>
+          </div>
+          <button class="md:hidden p-2" onClick={() => setMobileOpen(!mobileOpen)}>
+            <Icon name={mobileOpen ? 'close' : 'menu'} cls="w-5 h-5" />
+          </button>
+        </div>
+        {mobileOpen && (
+          <div class="md:hidden bg-parchment border-t border-gold/20 px-6 py-4 flex flex-col gap-4">
+            {['Features', 'Pricing', 'About', 'Contact'].map(n => <a key={n} href="#" class="text-sm font-medium text-ink/70">{n}</a>)}
+            <button onClick={onLogin} class="text-sm font-medium bg-cobalt text-white px-5 py-2.5 rounded-lg w-full">Sign in as Admin →</button>
+          </div>
+        )}
+      </header>
+
+      {/* HERO */}
+      <section class="hero-grid pt-28 pb-20 px-6 relative overflow-hidden">
+        <div class="absolute top-20 right-0 w-96 h-96 bg-gold/8 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-10 w-64 h-64 bg-cobalt/6 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="max-w-4xl mx-auto text-center relative">
+          <div class="inline-flex items-center gap-2 bg-cobalt-light text-cobalt text-xs font-medium px-4 py-1.5 rounded-full mb-6 animate-fade-up">
+            <span class="w-1.5 h-1.5 rounded-full bg-cobalt animate-pulse inline-block"></span>
+            Trusted by 1,200+ schools across India
+          </div>
+          <h1 class="font-serif text-5xl md:text-7xl text-ink leading-tight text-balance mb-6 animate-fade-up delay-1">
+            The modern way to<br /><em class="text-gold not-italic">run your school</em>
+          </h1>
+          <p class="text-lg md:text-xl text-ink/60 max-w-2xl mx-auto leading-relaxed mb-10 animate-fade-up delay-2">
+            EduNova unifies admissions, attendance, exams, fees, and analytics into one elegant platform — built for Indian schools.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 justify-center animate-fade-up delay-3">
+            <button onClick={onLogin} class="group flex items-center justify-center gap-2 bg-cobalt text-white font-medium px-8 py-3.5 rounded-xl hover:bg-cobalt/90 transition-all shadow-lg shadow-cobalt/20">
+              Start free trial
+              <Icon name="arrow" cls="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button class="flex items-center justify-center gap-2 border border-ink/15 text-ink font-medium px-8 py-3.5 rounded-xl hover:bg-ink/5 transition-all">
+              Watch demo
+            </button>
+          </div>
+          <p class="text-xs text-ink/40 mt-4 animate-fade-up delay-4">No credit card required · Free 30-day trial</p>
+        </div>
+
+        {/* Hero card mockup */}
+        <div class="max-w-3xl mx-auto mt-16 animate-fade-up delay-5 relative">
+          <div class="absolute inset-0 bg-gradient-to-b from-transparent to-parchment pointer-events-none z-10 h-full rounded-2xl" style={{background:'linear-gradient(to bottom, transparent 60%, #F8F5EF 100%)'}}></div>
+          <div class="bg-white border border-ink/8 rounded-2xl shadow-2xl shadow-ink/8 overflow-hidden">
+            <div class="bg-ink h-8 flex items-center gap-1.5 px-4">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-light opacity-70"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-gold-light opacity-70"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-sage-light opacity-70"></span>
+              <span class="text-white/30 text-xs ml-4 font-mono">dashboard.edunova.app</span>
+            </div>
+            <div class="p-5 grid grid-cols-4 gap-3">
+              {[{l:'Students',v:'1,284',c:'bg-cobalt-light text-cobalt'},{l:'Attendance',v:'91.4%',c:'bg-sage-light text-sage'},{l:'Teachers',v:'68',c:'bg-amber-light text-amber'},{l:'Fees',v:'₹18.4L',c:'bg-rose-light text-rose'}].map(m=>(
+                <div key={m.l} class={`${m.c} rounded-xl p-4`}>
+                  <div class="text-xs opacity-70 mb-1">{m.l}</div>
+                  <div class="text-xl font-serif font-semibold">{m.v}</div>
+                </div>
+              ))}
+            </div>
+            <div class="px-5 pb-5 grid grid-cols-3 gap-3">
+              {['Mathematics · 9-A · Rm 101','English · 11-B · Rm 204','Science Lab · 6-C · Lab 2'].map((s,i)=>(
+                <div key={i} class="bg-parchment rounded-lg p-3 border border-ink/5">
+                  <div class="text-xs text-ink/50 mb-1">{['8:00 am','9:30 am','11:00 am'][i]}</div>
+                  <div class="text-sm font-medium text-ink">{s.split('·')[0]}</div>
+                  <div class="text-xs text-ink/50">{s.split('·').slice(1).join('·')}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section class="py-14 px-6 border-y border-gold/15 bg-white/40">
+        <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+          {stats.map(s => (
+            <div key={s.label} class="text-center">
+              <div class="font-serif text-4xl text-cobalt mb-1">{s.val}</div>
+              <div class="text-sm text-ink/50">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section class="py-24 px-6">
+        <div class="max-w-6xl mx-auto">
+          <div class="text-center mb-16">
+            <p class="text-xs font-semibold tracking-widest text-gold uppercase mb-3">Everything you need</p>
+            <h2 class="font-serif text-4xl md:text-5xl text-ink text-balance">One platform, every module</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {features.map((f, i) => (
+              <div key={f.label} class={`feature-card bg-white border border-ink/8 rounded-2xl p-7 cursor-default`}>
+                <div class={`w-11 h-11 ${colorMap[f.color]} rounded-xl flex items-center justify-center mb-5`}>
+                  <Icon name={f.icon} cls="w-5 h-5" />
+                </div>
+                <h3 class="font-serif text-xl text-ink mb-2">{f.label}</h3>
+                <p class="text-sm text-ink/55 leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section class="py-24 px-6 bg-ink text-parchment relative overflow-hidden">
+        <div class="absolute inset-0 hero-grid opacity-10 pointer-events-none"></div>
+        <div class="max-w-6xl mx-auto relative">
+          <div class="text-center mb-14">
+            <p class="text-xs font-semibold tracking-widest text-gold uppercase mb-3">Testimonials</p>
+            <h2 class="font-serif text-4xl text-parchment">Loved by school administrators</h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map(t => (
+              <div key={t.name} class="bg-white/5 border border-white/10 rounded-2xl p-7">
+                <div class="flex gap-0.5 mb-4">
+                  {[...Array(5)].map((_, i) => <Icon key={i} name="star" cls="w-3.5 h-3.5 text-gold" />)}
+                </div>
+                <p class="text-parchment/80 text-sm leading-relaxed mb-5 font-light">"{t.quote}"</p>
+                <div>
+                  <div class="font-medium text-parchment text-sm">{t.name}</div>
+                  <div class="text-parchment/40 text-xs mt-0.5">{t.role}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section class="py-24 px-6">
+        <div class="max-w-2xl mx-auto text-center">
+          <h2 class="font-serif text-4xl md:text-5xl text-ink mb-5 text-balance">Ready to modernise your school?</h2>
+          <p class="text-ink/55 mb-8 text-lg">Join 1,200+ schools. Setup in under a day. No IT team required.</p>
+          <button onClick={onLogin} class="group inline-flex items-center gap-2 bg-cobalt text-white font-medium px-10 py-4 rounded-xl hover:bg-cobalt/90 transition-all shadow-xl shadow-cobalt/20 text-base">
+            Get started free
+            <Icon name="arrow" cls="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer class="border-t border-ink/8 py-10 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 bg-cobalt rounded-lg flex items-center justify-center">
+              <span class="text-white font-serif text-xs font-bold">E</span>
+            </div>
+            <span class="font-serif text-lg text-ink">EduNova</span>
+          </div>
+          <p class="text-xs text-ink/40">© 2026 EduNova Technologies Pvt Ltd · Made in India 🇮🇳</p>
+          <div class="flex gap-5 text-xs text-ink/40">
+            <a href="#" class="hover:text-ink transition-colors">Privacy</a>
+            <a href="#" class="hover:text-ink transition-colors">Terms</a>
+            <a href="#" class="hover:text-ink transition-colors">Support</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+/* ─── LOGIN MODAL ─── */
+const LoginModal = ({ onSuccess, onClose }) => {
+  const [email, setEmail] = useState('admin@edunova.app');
+  const [password, setPassword] = useState('password');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError('');
+    if (!email || !password) { setError('Please fill in all fields.'); return; }
+    setLoading(true);
+    setTimeout(() => { setLoading(false); onSuccess(); }, 900);
+  };
+
+  return (
+    <div class="fixed inset-0 bg-ink/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div class="bg-parchment rounded-2xl shadow-2xl w-full max-w-md p-8 relative animate-fade-up" onClick={e => e.stopPropagation()}>
+        <button onClick={onClose} class="absolute top-5 right-5 text-ink/30 hover:text-ink transition-colors">
+          <Icon name="close" cls="w-5 h-5" />
+        </button>
+        <div class="flex items-center gap-2 mb-7">
+          <div class="w-8 h-8 bg-cobalt rounded-lg flex items-center justify-center">
+            <span class="text-white font-serif text-sm font-bold">E</span>
+          </div>
+          <span class="font-serif text-xl text-ink">EduNova</span>
+        </div>
+        <h2 class="font-serif text-2xl text-ink mb-1">Welcome back</h2>
+        <p class="text-sm text-ink/50 mb-7">Sign in to your admin dashboard</p>
+        <form onSubmit={handleSubmit} class="space-y-4">
+          <div>
+            <label class="text-xs font-semibold text-ink/50 uppercase tracking-wide block mb-1.5">Email address</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+              class="w-full bg-white border border-ink/12 rounded-xl px-4 py-3 text-sm text-ink focus:border-cobalt focus:ring-2 focus:ring-cobalt/10 transition-all"
+              placeholder="admin@school.edu" />
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-ink/50 uppercase tracking-wide block mb-1.5">Password</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+              class="w-full bg-white border border-ink/12 rounded-xl px-4 py-3 text-sm text-ink focus:border-cobalt focus:ring-2 focus:ring-cobalt/10 transition-all"
+              placeholder="••••••••" />
+          </div>
+          {error && <p class="text-xs text-rose bg-rose-light px-3 py-2 rounded-lg">{error}</p>}
+          <button type="submit" disabled={loading}
+            class="w-full bg-cobalt text-white font-medium py-3 rounded-xl hover:bg-cobalt/90 transition-all shadow-lg shadow-cobalt/20 flex items-center justify-center gap-2 disabled:opacity-70">
+            {loading ? <><span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block"></span> Signing in…</> : 'Sign in to dashboard →'}
+          </button>
+        </form>
+        <p class="text-xs text-ink/35 text-center mt-5">Pre-filled with demo credentials · click Sign in</p>
+      </div>
+    </div>
+  );
+};
+
+/* ─── ADMIN DASHBOARD ─── */
+const Dashboard = ({ onLogout }) => {
+  const [activePage, setActivePage] = useState('Dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const navSections = [
+    { label: 'Main', items: [
+      { name: 'Dashboard', icon: 'dashboard' },
+      { name: 'Students', icon: 'students', badge: 3 },
+      { name: 'Timetable', icon: 'timetable' },
+      { name: 'Attendance', icon: 'attendance' },
+      { name: 'Exams & Grades', icon: 'exams' },
+    ]},
+    { label: 'Admin', items: [
+      { name: 'Teachers', icon: 'teachers' },
+      { name: 'Fees & Finance', icon: 'fees' },
+      { name: 'Reports', icon: 'reports' },
+      { name: 'Settings', icon: 'settings' },
+    ]},
+  ];
+
+  const metrics = [
+    { label: 'Total students', val: '1,284', change: '+34 this year', up: true, color: 'bg-cobalt-light text-cobalt' },
+    { label: "Today's attendance", val: '91.4%', change: '−2.1% vs last week', up: false, color: 'bg-sage-light text-sage' },
+    { label: 'Active teachers', val: '68', change: '+3 new this term', up: true, color: 'bg-amber-light text-amber' },
+    { label: 'Fees collected', val: '₹18.4L', change: '+12% vs last month', up: true, color: 'bg-rose-light text-rose' },
+  ];
+
+  const students = [
+    { initials: 'AR', name: 'Aryan Mehta', cls: '9-A · Roll 21', status: 'Active', color: 'bg-cobalt-light text-cobalt' },
+    { initials: 'PS', name: 'Priya Sharma', cls: '11-B · Roll 07', status: 'Active', color: 'bg-sage-light text-sage' },
+    { initials: 'RK', name: 'Rohan Kulkarni', cls: '6-C · Roll 14', status: 'Fee due', color: 'bg-amber-light text-amber' },
+    { initials: 'SN', name: 'Sneha Nair', cls: '10-A · Roll 02', status: 'Absent', color: 'bg-rose-light text-rose' },
+    { initials: 'VJ', name: 'Vikram Joshi', cls: '8-B · Roll 31', status: 'Active', color: 'bg-cobalt-light text-cobalt' },
+  ];
+
+  const schedule = [
+    { time: '8:00 am', subject: 'Mathematics', teacher: 'Mr. Kapoor', room: 'R-101', dot: '#1B3F8B' },
+    { time: '9:30 am', subject: 'English', teacher: 'Ms. D\'Souza', room: 'R-204', dot: '#3A6B4F' },
+    { time: '11:00 am', subject: 'Science Lab', teacher: 'Dr. Rao', room: 'Lab-2', dot: '#A0334A' },
+    { time: '2:00 pm', subject: 'Social Studies', teacher: 'Ms. Iyer', room: 'R-302', dot: '#B85C1A' },
+  ];
+
+  const attendance = [
+    { cls: 'Class 10', pct: 96, color: '#1B3F8B' },
+    { cls: 'Class 9', pct: 88, color: '#3A6B4F' },
+    { cls: 'Class 8', pct: 79, color: '#B85C1A' },
+    { cls: 'Class 7', pct: 92, color: '#A0334A' },
+  ];
+
+  const statusStyle = { 'Active': 'bg-sage-light text-sage', 'Fee due': 'bg-amber-light text-amber', 'Absent': 'bg-rose-light text-rose' };
+
+  const SidebarContent = () => (
+    <div class="flex flex-col h-full">
+      <div class="p-5 border-b border-ink/8 flex items-center gap-2">
+        <div class="w-8 h-8 bg-cobalt rounded-lg flex items-center justify-center">
+          <span class="text-white font-serif text-sm font-bold">E</span>
+        </div>
+        <span class="font-serif text-lg text-ink">EduNova</span>
+      </div>
+      <nav class="flex-1 p-3 overflow-y-auto dash-scroll">
+        {navSections.map(sec => (
+          <div key={sec.label} class="mb-2">
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-ink/35 px-3 py-2 mt-1">{sec.label}</p>
+            {sec.items.map(item => (
+              <button key={item.name} onClick={() => { setActivePage(item.name); setSidebarOpen(false); }}
+                class={`sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium mb-0.5 ${activePage === item.name ? 'bg-cobalt text-white shadow-sm shadow-cobalt/30' : 'text-ink/60 hover:bg-ink/5 hover:text-ink'}`}>
+                <Icon name={item.icon} cls="w-4 h-4 flex-shrink-0" />
+                <span class="flex-1 text-left">{item.name}</span>
+                {item.badge && <span class={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${activePage === item.name ? 'bg-white/20 text-white' : 'bg-rose-light text-rose'}`}>{item.badge}</span>}
+              </button>
+            ))}
+          </div>
+        ))}
+      </nav>
+      <div class="p-3 border-t border-ink/8">
+        <div class="flex items-center gap-3 px-3 py-2 rounded-xl bg-parchment mb-2">
+          <div class="w-8 h-8 bg-cobalt-light rounded-full flex items-center justify-center text-cobalt text-xs font-semibold">AP</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-ink truncate">Admin Principal</div>
+            <div class="text-xs text-ink/40 truncate">admin@edunova.app</div>
+          </div>
+        </div>
+        <button onClick={onLogout} class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-ink/50 hover:bg-rose-light hover:text-rose transition-colors">
+          <Icon name="logout" cls="w-4 h-4" />
+          Sign out
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div class="min-h-screen bg-parchment flex flex-col">
+      {/* Top bar */}
+      <header class="bg-white border-b border-ink/8 h-14 flex items-center justify-between px-4 md:px-6 flex-shrink-0 sticky top-0 z-30">
+        <div class="flex items-center gap-3">
+          <button class="md:hidden p-1.5 text-ink/50 hover:text-ink" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            <Icon name="menu" cls="w-5 h-5" />
+          </button>
+          <div class="hidden md:block">
+            <span class="text-base font-serif text-ink">{activePage}</span>
+            <span class="text-ink/30 mx-2 text-sm">/</span>
+            <span class="text-sm text-ink/40">Academic Year 2025–26</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="hidden sm:flex items-center gap-2 bg-parchment border border-ink/10 rounded-xl px-3 py-1.5">
+            <svg class="w-3.5 h-3.5 text-ink/35" fill="none" viewBox="0 0 16 16" stroke="currentColor" strokeWidth={1.5}><circle cx="6.5" cy="6.5" r="5"/><path d="M10 10l3.5 3.5"/></svg>
+            <span class="text-xs text-ink/35">Search…</span>
+          </div>
+          <button class="relative p-2 text-ink/50 hover:text-ink hover:bg-parchment rounded-xl transition-colors">
+            <Icon name="bell" cls="w-4.5 h-4.5" />
+            <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose rounded-full"></span>
+          </button>
+          <div class="w-8 h-8 bg-cobalt-light rounded-full flex items-center justify-center text-cobalt text-xs font-semibold cursor-pointer">AP</div>
+        </div>
+      </header>
+
+      <div class="flex flex-1 min-h-0">
+        {/* Desktop sidebar */}
+        <aside class="hidden md:flex flex-col w-56 bg-white border-r border-ink/8 flex-shrink-0 sticky top-14 h-[calc(100vh-3.5rem)]">
+          <SidebarContent />
+        </aside>
+
+        {/* Mobile sidebar */}
+        {sidebarOpen && (
+          <div class="md:hidden fixed inset-0 z-40" onClick={() => setSidebarOpen(false)}>
+            <div class="absolute inset-0 bg-ink/30 backdrop-blur-sm"></div>
+            <aside class="absolute left-0 top-0 bottom-0 w-64 bg-white shadow-2xl z-50" onClick={e => e.stopPropagation()}>
+              <SidebarContent />
+            </aside>
+          </div>
+        )}
+
+        {/* Main */}
+        <main class="flex-1 overflow-y-auto dash-scroll p-4 md:p-6">
+          <div class="max-w-6xl mx-auto space-y-5 animate-fade-in">
+            {/* Page title */}
+            <div>
+              <h1 class="font-serif text-2xl text-ink">{activePage}</h1>
+              <p class="text-sm text-ink/45 mt-0.5">Wednesday, 22 April 2026 · Academic Year 2025–26</p>
+            </div>
+
+            {/* Metrics */}
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {metrics.map(m => (
+                <div key={m.label} class={`stat-card ${m.color} rounded-2xl p-4`}>
+                  <div class="text-xs opacity-60 mb-2">{m.label}</div>
+                  <div class="font-serif text-2xl font-semibold mb-1">{m.val}</div>
+                  <div class={`text-xs font-medium ${m.up ? 'opacity-70' : 'opacity-60'}`}>{m.up ? '↑' : '↓'} {m.change}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Main grid */}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+              {/* Recent students */}
+              <div class="lg:col-span-2 bg-white border border-ink/8 rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="font-serif text-base text-ink">Recent admissions</h2>
+                  <button class="text-xs text-cobalt hover:underline font-medium">View all →</button>
+                </div>
+                <div class="space-y-1">
+                  {students.map(s => (
+                    <div key={s.name} class="flex items-center gap-3 py-2.5 px-2 rounded-xl hover:bg-parchment transition-colors cursor-default">
+                      <div class={`w-8 h-8 ${s.color} rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0`}>{s.initials}</div>
+                      <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium text-ink truncate">{s.name}</div>
+                        <div class="text-xs text-ink/45">{s.cls}</div>
+                      </div>
+                      <span class={`text-[11px] font-medium px-2.5 py-1 rounded-full ${statusStyle[s.status]}`}>{s.status}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right column */}
+              <div class="space-y-5">
+                {/* Schedule */}
+                <div class="bg-white border border-ink/8 rounded-2xl p-5">
+                  <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-serif text-base text-ink">Today's schedule</h2>
+                    <button class="text-xs text-cobalt hover:underline font-medium">Full →</button>
+                  </div>
+                  <div class="space-y-3">
+                    {schedule.map(s => (
+                      <div key={s.subject} class="flex items-start gap-3">
+                        <span class="text-[11px] text-ink/40 min-w-[52px] pt-0.5">{s.time}</span>
+                        <div class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{background: s.dot}}></div>
+                        <div class="flex-1">
+                          <div class="text-sm font-medium text-ink">{s.subject}</div>
+                          <div class="text-xs text-ink/40">{s.teacher}</div>
+                        </div>
+                        <span class="text-[11px] text-ink/30">{s.room}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Attendance */}
+                <div class="bg-white border border-ink/8 rounded-2xl p-5">
+                  <h2 class="font-serif text-base text-ink mb-4">Attendance by class</h2>
+                  <div class="space-y-3">
+                    {attendance.map(a => (
+                      <div key={a.cls}>
+                        <div class="flex justify-between mb-1">
+                          <span class="text-xs font-medium text-ink">{a.cls}</span>
+                          <span class="text-xs font-semibold text-ink">{a.pct}%</span>
+                        </div>
+                        <div class="h-1.5 bg-parchment rounded-full overflow-hidden">
+                          <div class="h-full rounded-full transition-all" style={{width: `${a.pct}%`, background: a.color}}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick actions */}
+            <div class="bg-cobalt rounded-2xl p-5 relative overflow-hidden">
+              <div class="absolute right-0 top-0 w-48 h-full opacity-10 pointer-events-none" style={{background:'radial-gradient(circle at right, white, transparent)'}}></div>
+              <h2 class="font-serif text-lg text-white mb-1">Quick actions</h2>
+              <p class="text-sm text-white/50 mb-4">Common tasks at a glance</p>
+              <div class="flex flex-wrap gap-2">
+                {['Mark attendance', 'Add student', 'Record payment', 'Send notice', 'Generate report', 'View timetable'].map(a => (
+                  <button key={a} onClick={() => setActivePage(a.includes('timetable') ? 'Timetable' : a.includes('student') ? 'Students' : a.includes('payment') ? 'Fees & Finance' : a.includes('attendance') ? 'Attendance' : 'Reports')}
+                    class="text-xs font-medium bg-white/10 hover:bg-white/20 text-white px-3.5 py-2 rounded-lg transition-colors border border-white/10">
+                    {a}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+/* ─── APP ROOT ─── */
+const App = () => {
+  const [view, setView] = useState('home'); // 'home' | 'login' | 'dashboard'
+
+  return (
+    <>
+      {view === 'home' && <Homepage onLogin={() => setView('login')} />}
+      {view === 'login' && (
+        <>
+          <Homepage onLogin={() => setView('login')} />
+          <LoginModal onSuccess={() => setView('dashboard')} onClose={() => setView('home')} />
+        </>
+      )}
+      {view === 'dashboard' && <Dashboard onLogout={() => setView('home')} />}
+    </>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
