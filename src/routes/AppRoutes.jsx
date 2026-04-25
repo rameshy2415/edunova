@@ -20,6 +20,7 @@ import ReportsPage     from "../pages/admin/ReportsPage";
 import TimetablePage   from "../pages/admin/TimetablePage";
 import AttendancePage  from "../pages/admin/AttendancePage";
 import SettingsPage    from "../pages/admin/SettingsPage";
+import ExamsGradesPage from "../pages/admin/ExamsGradesPage"
 
 // ── Teacher pages ──────────────────────────────────────────────────────────
 import TeacherDashboard   from "../pages/teacher/TeacherDashboard";
@@ -109,6 +110,7 @@ export default function AppRoutes() {
         <Route path="reports"    element={<ReportsPage />} />
         <Route path="timetable"  element={<TimetablePage />} />
         <Route path="attendance" element={<AttendancePage />} />
+        <Route path="exams-grades" element={<ExamsGradesPage />} />
         <Route path="settings"   element={<SettingsPage />} />
       </Route>
 
