@@ -32,7 +32,8 @@ export function AuthProvider({ children }) {
    * Returns the user so the caller can redirect by role.
    */
   const login = useCallback(async (credentials) => {
-    const { data } = await authApi.login(credentials);
+    const { data } ={data: { token: "string", user: { id:1, name:"Admin Principal", email:"admin@edunova.app", role:"admin" } }}; 
+    //await authApi.login(credentials); Once API is ready then we will remove the hardcoded value
     localStorage.setItem("edunova_token", data.token);
     localStorage.setItem("edunova_user", JSON.stringify(data.user));
     setToken(data.token);
