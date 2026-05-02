@@ -4,17 +4,17 @@ import { authApi } from "../api/authApi";
 /**
  * AuthContext
  * ─────────────────────────────────────────────────────────────
- * Provides: user, role, token, login(), logout(), isAuthenticated
+ * Roles: "superadmin" | "admin" | "teacher" | "student" | "parent"
  *
- * Roles accepted: "admin" | "teacher" | "student" | "parent"
- *
- * Usage:
- *   const { user, role, login, logout, isAuthenticated } = useAuth();
+ * superadmin — platform-level: manages all schools & subscriptions
+ * admin      — school-level:   manages one school
+ * teacher    — class-level:    marks attendance, enters grades
+ * student    — read-only:      views own grades, fees, timetable
+ * parent     — read-only:      tracks child's progress
  */
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  // Rehydrate from localStorage so refresh doesn't log user out
   const [user, setUser] = useState(() => {
     try {
       const stored = localStorage.getItem("edunova_user");
@@ -24,27 +24,29 @@ export function AuthProvider({ children }) {
     }
   });
 
-  const [token, setToken] = useState(() => localStorage.getItem("edunova_token") || null);
+  const [token, setToken] = useState(
+    () => localStorage.getItem("edunova_token") || null
+  );
 
   /**
    * login({ email, password, role })
-   * Calls POST /auth/login, stores JWT + user object.
-   * Returns the user so the caller can redirect by role.
+   * Calls POST /auth/login → backend returns { token, user }
+   * Returns the user object so caller can redirect by role.
    */
   const login = useCallback(async (credentials) => {
+    //const { data } = await authApi.login(credentials);
     const { data } ={data: { token: "string", user: { id:1, name:"Admin Principal", email: credentials.email, role: credentials.role } }}; 
-    //await authApi.login(credentials); Once API is ready then we will remove the hardcoded value
     localStorage.setItem("edunova_token", data.token);
     localStorage.setItem("edunova_user", JSON.stringify(data.user));
     setToken(data.token);
     setUser(data.user);
-    return data.user; // { id, name, email, role, avatar? }
+    return data.user; // { id, name, email, role, schoolId?, avatar? }
   }, []);
 
-  /** Clears session completely */
+  /** Clear session — calls optional backend invalidation */
   const logout = useCallback(async () => {
     try {
-      await authApi.logout(); // optional backend invalidation
+      await authApi.logout();
     } catch (_) {
       // swallow — clear locally regardless
     } finally {
@@ -55,7 +57,7 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  /** Update stored profile (e.g. after editing account details) */
+  /** Merge updated fields into stored user (e.g. after profile edit) */
   const updateUser = useCallback((updates) => {
     setUser((prev) => {
       const updated = { ...prev, ...updates };
@@ -65,10 +67,12 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = {
-    user,           // full user object from backend
-    token,          // raw JWT (also set on axios default headers in axiosInstance)
-    role: user?.role ?? null,
+    user,                          // full user object from backend
+    token,                         // raw JWT
+    role: user?.role ?? null,      // "superadmin" | "admin" | "teacher" | "student" | "parent"
+    schoolId: user?.schoolId ?? null, // null for superadmin
     isAuthenticated: !!token,
+    isSuperAdmin: user?.role === "superadmin",
     login,
     logout,
     updateUser,
@@ -77,7 +81,6 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-/** Convenience hook */
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");

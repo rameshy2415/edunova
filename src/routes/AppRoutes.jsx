@@ -3,38 +3,62 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 // ── Layouts ────────────────────────────────────────────────────────────────
-import PublicLayout  from "../components/layout/PublicLayout";
-import DashboardLayout from "../components/layout/DashboardLayout";
+import PublicLayout      from "../components/layout/PublicLayout";
+import DashboardLayout   from "../components/layout/DashboardLayout";
+import SuperAdminLayout  from "../components/layout/SuperAdminLayout";
 
 // ── Public pages ───────────────────────────────────────────────────────────
-import HomePage        from "../pages/auth/HomePage";
-import LoginPage       from "../pages/auth/LoginPage";
+import HomePage         from "../pages/auth/HomePage";
+import LoginPage        from "../pages/auth/LoginPage";
 import UnauthorizedPage from "../pages/auth/UnauthorizedPage";
 
+// ── Super Admin pages ──────────────────────────────────────────────────────
+import SuperAdminDashboard from "../pages/superadmin/SuperAdminDashboard";
+import SchoolsList         from "../pages/superadmin/SchoolsList";
+import SchoolDetail        from "../pages/superadmin/SchoolDetail";
+import OnboardSchoolForm   from "../pages/superadmin/OnboardSchoolForm";
+import {
+  SubscriptionsPage,
+  AdminsPage,
+  AnalyticsPage,
+  SASettingsPage,
+  AuditLogsPage,
+} from "../pages/superadmin/SAPages";
+
 // ── Admin pages ────────────────────────────────────────────────────────────
-import AdminDashboard  from "../pages/admin/AdminDashboard";
-import StudentsPage    from "../pages/admin/StudentsPage";
-import TeachersPage    from "../pages/admin/TeachersPage";
-import FeesPage        from "../pages/admin/FeesPage";
-import ReportsPage     from "../pages/admin/ReportsPage";
-import TimetablePage   from "../pages/admin/TimetablePage";
-import AttendancePage  from "../pages/admin/AttendancePage";
-import SettingsPage    from "../pages/admin/SettingsPage";
-import ExamsGradesPage from "../pages/admin/ExamsGradesPage"
+import AdminDashboard    from "../pages/admin/AdminDashboard";
+//import StudentsCRUDPage  from "../pages/admin/StudentsCRUDPage";
+import StudentsPage      from "../pages/admin/StudentsPage";
+//import TeachersCRUDPage  from "../pages/admin/TeachersCRUDPage";
+import TeachersPage      from "../pages/admin/TeachersPage";
+import ExamsGradesPage   from "../pages/admin/ExamsGradesPage";
+import FeesPage          from "../pages/admin/FeesPage";
+import ReportsPage       from "../pages/admin/ReportsPage";
+import TimetablePage     from "../pages/admin/TimetablePage";
+import AttendancePage    from "../pages/admin/AttendancePage";
+import SettingsPage      from "../pages/admin/SettingsPage";
+
+// ── Student sub-pages (routed CRUD) ───────────────────────────────────────
+import StudentList   from "../pages/admin/students/StudentList";
+import StudentDetail from "../pages/admin/students/StudentDetail";
+import StudentForm   from "../pages/admin/students/StudentForm";
+
+// ── Teacher sub-pages (routed CRUD) ───────────────────────────────────────
+import TeacherList   from "../pages/admin/teachers/TeacherList";
 
 // ── Teacher pages ──────────────────────────────────────────────────────────
-import TeacherDashboard   from "../pages/teacher/TeacherDashboard";
-import TeacherClasses     from "../pages/teacher/TeacherClasses";
-import TeacherAttendance  from "../pages/teacher/TeacherAttendance";
-import TeacherGrades      from "../pages/teacher/TeacherGrades";
-import TeacherTimetable   from "../pages/teacher/TeacherTimetable";
+import TeacherDashboard  from "../pages/teacher/TeacherDashboard";
+import TeacherClasses    from "../pages/teacher/TeacherClasses";
+import TeacherAttendance from "../pages/teacher/TeacherAttendance";
+import TeacherGrades     from "../pages/teacher/TeacherGrades";
+import TeacherTimetable  from "../pages/teacher/TeacherTimetable";
 
 // ── Student pages ──────────────────────────────────────────────────────────
-import StudentDashboard from "../pages/student/StudentDashboard";
-import StudentGrades    from "../pages/student/StudentGrades";
+import StudentDashboard  from "../pages/student/StudentDashboard";
+import StudentGrades     from "../pages/student/StudentGrades";
 import StudentAttendance from "../pages/student/StudentAttendance";
-import StudentFees      from "../pages/student/StudentFees";
-import StudentTimetable from "../pages/student/StudentTimetable";
+import StudentFees       from "../pages/student/StudentFees";
+import StudentTimetable  from "../pages/student/StudentTimetable";
 
 // ── Parent pages ───────────────────────────────────────────────────────────
 import ParentDashboard  from "../pages/parent/ParentDashboard";
@@ -42,79 +66,126 @@ import ParentChildInfo  from "../pages/parent/ParentChildInfo";
 import ParentFees       from "../pages/parent/ParentFees";
 import ParentAttendance from "../pages/parent/ParentAttendance";
 
-// ── Role-based guard ───────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+//  Guards
+// ══════════════════════════════════════════════════════════════════════════
+
 /**
  * ProtectedRoute
- * Redirects to /login if not authenticated.
- * Redirects to /unauthorized if authenticated but wrong role.
- *
- * @param {string|string[]} roles — allowed role(s) for this route
+ * - Redirects to /login if not authenticated.
+ * - Redirects to /unauthorized if role not in allowed list.
  */
 function ProtectedRoute({ children, roles }) {
   const { isAuthenticated, role } = useAuth();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   const allowed = Array.isArray(roles) ? roles : [roles];
-  if (!allowed.includes(role)) {
-    return <Navigate to="/unauthorized" replace />;
-  }
+  if (!allowed.includes(role)) return <Navigate to="/unauthorized" replace />;
 
   return children;
 }
 
-/**
- * RoleRedirect — after login, bounce to the right dashboard
- */
+/** After login, send each role to their home dashboard */
 function RoleRedirect() {
   const { role, isAuthenticated } = useAuth();
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   const map = {
-    admin:   "/admin/dashboard",
-    teacher: "/teacher/dashboard",
-    student: "/student/dashboard",
-    parent:  "/parent/dashboard",
+    superadmin: "/superadmin/dashboard",
+    admin:      "/admin/dashboard",
+    teacher:    "/teacher/dashboard",
+    student:    "/student/dashboard",
+    parent:     "/parent/dashboard",
   };
   return <Navigate to={map[role] || "/login"} replace />;
 }
 
-// ── Route tree ─────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+//  Route tree
+// ══════════════════════════════════════════════════════════════════════════
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* ── Public ── */}
+
+      {/* ── Public ─────────────────────────────────────────────────────── */}
       <Route element={<PublicLayout />}>
-        <Route path="/"            element={<HomePage />} />
-        <Route path="/login"       element={<LoginPage />} />
+        <Route path="/"             element={<HomePage />} />
+        <Route path="/login"        element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
-        <Route path="/dashboard"   element={<RoleRedirect />} />
+        <Route path="/dashboard"    element={<RoleRedirect />} />
       </Route>
 
-      {/* ── Admin ── */}
+      {/* ══════════════════════════════════════════════════════════════════
+          SUPER ADMIN  —  /superadmin/*
+          Purple sidebar, platform-wide scope, no schoolId required.
+      ══════════════════════════════════════════════════════════════════ */}
+      <Route
+        path="/superadmin"
+        element={
+          <ProtectedRoute roles="superadmin">
+            <SuperAdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard"     element={<SuperAdminDashboard />} />
+
+        {/* Schools management */}
+        <Route path="schools"                    element={<SchoolsList />} />
+        <Route path="schools/new"                element={<OnboardSchoolForm />} />
+        <Route path="schools/:id"                element={<SchoolDetail />} />
+        <Route path="schools/:id/edit"           element={<OnboardSchoolForm />} />
+
+        {/* Other SA modules */}
+        <Route path="subscriptions"  element={<SubscriptionsPage />} />
+        <Route path="admins"         element={<AdminsPage />} />
+        <Route path="analytics"      element={<AnalyticsPage />} />
+        <Route path="settings"       element={<SASettingsPage />} />
+        <Route path="audit"          element={<AuditLogsPage />} />
+      </Route>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          ADMIN  —  /admin/*
+          Blue sidebar, school-scoped.
+      ══════════════════════════════════════════════════════════════════ */}
       <Route
         path="/admin"
         element={
-          <ProtectedRoute roles="admin">
+          <ProtectedRoute roles={["admin", "superadmin"]}>
+            {/* superadmin can shadow-view any school's admin panel */}
             <DashboardLayout />
           </ProtectedRoute>
         }
       >
         <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard"  element={<AdminDashboard />} />
-        <Route path="students"   element={<StudentsPage />} />
-        <Route path="teachers"   element={<TeachersPage />} />
-        <Route path="fees"       element={<FeesPage />} />
-        <Route path="reports"    element={<ReportsPage />} />
-        <Route path="timetable"  element={<TimetablePage />} />
-        <Route path="attendance" element={<AttendancePage />} />
-        <Route path="exams-grades" element={<ExamsGradesPage />} />
-        <Route path="settings"   element={<SettingsPage />} />
+        <Route path="dashboard"         element={<AdminDashboard />} />
+
+        {/* Students — routed CRUD (list → detail → new/edit form) */}
+        <Route path="students"          element={<StudentList />} />
+        <Route path="students/new"      element={<StudentForm />} />
+        <Route path="students/:id"      element={<StudentDetail />} />
+        <Route path="students/:id/edit" element={<StudentForm />} />
+
+        {/* Legacy CRUD modal page (kept for backwards compat) */}
+        {/* <Route path="students/manage"   element={<StudentsCRUDPage />} /> */}
+
+        {/* Teachers — routed CRUD */}
+        <Route path="teachers"          element={<TeacherList />} />
+        {/* <Route path="teachers/manage"   element={<TeachersCRUDPage />} /> */}
+
+        {/* Other admin modules */}
+        <Route path="exams"             element={<ExamsGradesPage />} />
+        <Route path="fees"              element={<FeesPage />} />
+        <Route path="reports"           element={<ReportsPage />} />
+        <Route path="timetable"         element={<TimetablePage />} />
+        <Route path="attendance"        element={<AttendancePage />} />
+        <Route path="settings"          element={<SettingsPage />} />
       </Route>
 
-      {/* ── Teacher ── */}
+      {/* ══════════════════════════════════════════════════════════════════
+          TEACHER  —  /teacher/*
+      ══════════════════════════════════════════════════════════════════ */}
       <Route
         path="/teacher"
         element={
@@ -131,7 +202,9 @@ export default function AppRoutes() {
         <Route path="timetable"  element={<TeacherTimetable />} />
       </Route>
 
-      {/* ── Student ── */}
+      {/* ══════════════════════════════════════════════════════════════════
+          STUDENT  —  /student/*
+      ══════════════════════════════════════════════════════════════════ */}
       <Route
         path="/student"
         element={
@@ -148,7 +221,9 @@ export default function AppRoutes() {
         <Route path="timetable"  element={<StudentTimetable />} />
       </Route>
 
-      {/* ── Parent ── */}
+      {/* ══════════════════════════════════════════════════════════════════
+          PARENT  —  /parent/*
+      ══════════════════════════════════════════════════════════════════ */}
       <Route
         path="/parent"
         element={
@@ -164,8 +239,9 @@ export default function AppRoutes() {
         <Route path="attendance" element={<ParentAttendance />} />
       </Route>
 
-      {/* ── 404 fallback ── */}
+      {/* ── 404 fallback ───────────────────────────────────────────────── */}
       <Route path="*" element={<Navigate to="/" replace />} />
+
     </Routes>
   );
 }

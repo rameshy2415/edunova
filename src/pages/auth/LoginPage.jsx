@@ -3,41 +3,80 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const ROLES = [
-  { id: "admin",   label: "Admin",   icon: "🏫", desc: "School administration" },
-  { id: "teacher", label: "Teacher", icon: "📚", desc: "Class & grade management" },
-  { id: "student", label: "Student", icon: "🎓", desc: "My grades, attendance & fees" },
-  { id: "parent",  label: "Parent",  icon: "👨‍👩‍👧", desc: "Track your child's progress" },
+  {
+    id:    "superadmin",
+    label: "Super Admin",
+    icon:  "🌐",
+    desc:  "Manage all schools & platform",
+    accentBorder: "border-purple-500",
+    accentBg:     "bg-purple-50",
+    badge:        "bg-purple-100 text-purple-700",
+  },
+  {
+    id:    "admin",
+    label: "Admin",
+    icon:  "🏫",
+    desc:  "School administration",
+    accentBorder: "border-cobalt",
+    accentBg:     "bg-cobalt-light",
+    badge:        "bg-cobalt-light text-cobalt",
+  },
+  {
+    id:    "teacher",
+    label: "Teacher",
+    icon:  "📚",
+    desc:  "Class & grade management",
+    accentBorder: "border-sage",
+    accentBg:     "bg-sage-light",
+    badge:        "bg-sage-light text-sage",
+  },
+  {
+    id:    "student",
+    label: "Student",
+    icon:  "🎓",
+    desc:  "My grades, attendance & fees",
+    accentBorder: "border-amber",
+    accentBg:     "bg-amber-light",
+    badge:        "bg-amber-light text-amber",
+  },
+  {
+    id:    "parent",
+    label: "Parent",
+    icon:  "👨‍👩‍👧",
+    desc:  "Track your child's progress",
+    accentBorder: "border-rose",
+    accentBg:     "bg-rose-light",
+    badge:        "bg-rose-light text-rose",
+  },
 ];
 
-const ROLE_ACCENT = {
-  admin:   "border-cobalt bg-cobalt-light",
-  teacher: "border-sage bg-sage-light",
-  student: "border-amber bg-amber-light",
-  parent:  "border-rose bg-rose-light",
-};
-
 const DASHBOARD_MAP = {
-  admin:   "/admin/dashboard",
-  teacher: "/teacher/dashboard",
-  student: "/student/dashboard",
-  parent:  "/parent/dashboard",
+  superadmin: "/superadmin/dashboard",
+  admin:      "/admin/dashboard",
+  teacher:    "/teacher/dashboard",
+  student:    "/student/dashboard",
+  parent:     "/parent/dashboard",
 };
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
 
   const [selectedRole, setSelectedRole] = useState("admin");
-  const [email, setEmail]         = useState("admin@edunova.app");
-  const [password, setPassword]   = useState("password");
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState("");
+  const [email,        setEmail]        = useState("admin@edunova.app");
+  const [password,     setPassword]     = useState("password");
+  const [loading,      setLoading]      = useState(false);
+  const [error,        setError]        = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Pre-fill demo credentials when role changes
+  /** Pre-fill demo credentials when role is selected */
   const handleRoleSelect = (roleId) => {
     setSelectedRole(roleId);
-    setEmail(`${roleId}@edunova.app`);
+    setEmail(
+      roleId === "superadmin"
+        ? "superadmin@edunova.app"
+        : `${roleId}@edunova.app`
+    );
     setPassword("password");
     setError("");
   };
@@ -45,7 +84,6 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) { setError("Please fill in all fields."); return; }
-
     setLoading(true);
     setError("");
     try {
@@ -58,9 +96,12 @@ export default function LoginPage() {
     }
   };
 
+  const selected = ROLES.find((r) => r.id === selectedRole);
+
   return (
     <div className="min-h-screen bg-parchment flex items-center justify-center px-4 pt-20 pb-10">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-lg">
+
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 mb-8">
           <div className="w-9 h-9 bg-cobalt rounded-xl flex items-center justify-center">
@@ -72,8 +113,8 @@ export default function LoginPage() {
         <h1 className="font-serif text-3xl text-ink mb-1">Welcome back</h1>
         <p className="text-sm text-ink/50 mb-7">Select your role and sign in to continue.</p>
 
-        {/* Role selector */}
-        <div className="grid grid-cols-2 gap-2.5 mb-6">
+        {/* Role selector — 5 roles in a grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-6">
           {ROLES.map((r) => (
             <button
               key={r.id}
@@ -81,18 +122,26 @@ export default function LoginPage() {
               onClick={() => handleRoleSelect(r.id)}
               className={`flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all ${
                 selectedRole === r.id
-                  ? `${ROLE_ACCENT[r.id]} border-opacity-100`
+                  ? `${r.accentBorder} ${r.accentBg}`
                   : "border-ink/8 bg-white hover:border-ink/20"
-              }`}
+              } ${r.id === "superadmin" ? "sm:col-span-1" : ""}`}
             >
-              <span className="text-xl leading-none">{r.icon}</span>
-              <div>
-                <div className="text-sm font-semibold text-ink">{r.label}</div>
+              <span className="text-xl leading-none flex-shrink-0">{r.icon}</span>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-ink truncate">{r.label}</div>
                 <div className="text-[11px] text-ink/45 leading-tight">{r.desc}</div>
               </div>
             </button>
           ))}
         </div>
+
+        {/* Super admin notice */}
+        {selectedRole === "superadmin" && (
+          <div className="flex items-center gap-3 px-4 py-3 bg-purple-50 border border-purple-200 rounded-xl mb-5 text-sm text-purple-700">
+            <span className="text-lg">🔐</span>
+            <span>Super Admin has platform-wide access. Only authorised EduNova staff should use this role.</span>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,7 +154,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-white border border-ink/12 rounded-xl px-4 py-3 text-sm text-ink focus:border-cobalt focus:ring-2 focus:ring-cobalt/10 transition-all outline-none"
-              placeholder="you@school.edu"
+              placeholder="you@edunova.app"
               autoComplete="email"
             />
           </div>
@@ -137,7 +186,8 @@ export default function LoginPage() {
                   </svg>
                 ) : (
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
                   </svg>
                 )}
               </button>
@@ -156,7 +206,11 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-cobalt text-white font-medium py-3.5 rounded-xl hover:bg-cobalt/90 transition-all shadow-lg shadow-cobalt/20 flex items-center justify-center gap-2 disabled:opacity-70 text-sm"
+            className={`w-full font-medium py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 text-sm ${
+              selectedRole === "superadmin"
+                ? "bg-purple-700 hover:bg-purple-800 text-white shadow-purple-200"
+                : "bg-cobalt text-white hover:bg-cobalt/90 shadow-cobalt/20"
+            }`}
           >
             {loading ? (
               <>
@@ -167,13 +221,13 @@ export default function LoginPage() {
                 Signing in…
               </>
             ) : (
-              `Sign in as ${ROLES.find((r) => r.id === selectedRole)?.label} →`
+              `Sign in as ${selected?.label} →`
             )}
           </button>
         </form>
 
         <p className="text-xs text-ink/35 text-center mt-5">
-          Pre-filled demo credentials per role. Click Sign in to proceed.
+          Pre-filled demo credentials per role — click Sign in to proceed.
         </p>
       </div>
     </div>
