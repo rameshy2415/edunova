@@ -168,12 +168,12 @@ export default function AppRoutes() {
         <Route path="students/:id/edit" element={<StudentForm />} />
 
         {/* Legacy CRUD modal page (kept for backwards compat) */}
-        {/* <Route path="students/manage"   element={<StudentsCRUDPage />} /> */}
+        {/* <Route path="students/manage"   element={<StudentsPage />} /> */}
 
         {/* Teachers — routed CRUD */}
         {/* <Route path="teachers"          element={<TeacherList />} /> */}
         <Route path="teachers"          element={<TeachersPage />} />
-        {/* <Route path="teachers/manage"   element={<TeachersCRUDPage />} /> */}
+        {/* <Route path="teachers/manage"   element={<TeachersPage />} /> */}
 
         {/* Other admin modules */}
         <Route path="exams"             element={<ExamsGradesPage />} />
