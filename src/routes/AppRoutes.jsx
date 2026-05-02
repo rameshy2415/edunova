@@ -171,7 +171,8 @@ export default function AppRoutes() {
         {/* <Route path="students/manage"   element={<StudentsCRUDPage />} /> */}
 
         {/* Teachers — routed CRUD */}
-        <Route path="teachers"          element={<TeacherList />} />
+        {/* <Route path="teachers"          element={<TeacherList />} /> */}
+        <Route path="teachers"          element={<TeachersPage />} />
         {/* <Route path="teachers/manage"   element={<TeachersCRUDPage />} /> */}
 
         {/* Other admin modules */}
