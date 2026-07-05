@@ -85,7 +85,7 @@ export default function HomePage() {
             </div>
             <div className="p-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { l: "Students",   v: "1,284", c: "bg-cobalt-light text-cobalt" },
+                { l: "Students",   v: "1,284",  c: "bg-cobalt-light text-cobalt" },
                 { l: "Attendance", v: "91.4%",  c: "bg-sage-light text-sage" },
                 { l: "Teachers",   v: "68",     c: "bg-amber-light text-amber" },
                 { l: "Fees",       v: "₹18.4L", c: "bg-rose-light text-rose" },

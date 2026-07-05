@@ -6,12 +6,12 @@ import {
 
 /* ─── Seed data ──────────────────────────────────────────── */
 const SEED = [
-  { id: 1, admNo: "EDN-2021-1284", name: "Aryan Mehta",    dob: "14 Aug 2010", gender: "Male",   class: "9-A",  roll: 21, father: "Rakesh Mehta",    phone: "+91 98765 43210", email: "r.mehta@example.com",   blood: "B+",  status: "Active",   fees: "Paid",    attendance: 96 },
-  { id: 2, admNo: "EDN-2021-1285", name: "Priya Sharma",   dob: "22 Mar 2009", gender: "Female", class: "11-B", roll: 7,  father: "Suresh Sharma",   phone: "+91 98765 43211", email: "s.sharma@example.com",  blood: "O+",  status: "Active",   fees: "Partial", attendance: 88 },
-  { id: 3, admNo: "EDN-2022-1410", name: "Rohan Kulkarni", dob: "5 Jul 2012",  gender: "Male",   class: "6-C",  roll: 14, father: "Anil Kulkarni",   phone: "+91 98765 43212", email: "a.kulkarni@example.com",blood: "A+",  status: "Active",   fees: "Overdue", attendance: 72 },
-  { id: 4, admNo: "EDN-2020-1100", name: "Sneha Nair",     dob: "18 Nov 2008", gender: "Female", class: "10-A", roll: 2,  father: "Vijay Nair",      phone: "+91 98765 43213", email: "v.nair@example.com",    blood: "B-",  status: "Inactive", fees: "Paid",    attendance: 91 },
-  { id: 5, admNo: "EDN-2022-1411", name: "Vikram Joshi",   dob: "9 Sep 2011",  gender: "Male",   class: "8-B",  roll: 31, father: "Deepak Joshi",    phone: "+91 98765 43214", email: "d.joshi@example.com",   blood: "AB+", status: "Active",   fees: "Partial", attendance: 85 },
-  { id: 6, admNo: "EDN-2023-1560", name: "Neha Kulkarni",  dob: "1 Feb 2012",  gender: "Female", class: "7-A",  roll: 9,  father: "Ramesh Kulkarni", phone: "+91 98765 43215", email: "r.kulkarni@example.com",blood: "O-",  status: "Active",   fees: "Paid",    attendance: 98 },
+  { id: 1, admissionNo: "EDN-2021-1284", name: "Aryan Mehta",    dateOfBirth: "14 Aug 2010", gender: "Male",   class: "9-A",  roll: 21, father: "Rakesh Mehta",    phone: "+91 98765 43210", email: "r.mehta@example.com",   bloodGroup: "B+",  status: "Active",   fees: "Paid",    attendance: 96 },
+  { id: 2, admissionNo: "EDN-2021-1285", name: "Priya Sharma",   dateOfBirth: "22 Mar 2009", gender: "Female", class: "11-B", roll: 7,  father: "Suresh Sharma",   phone: "+91 98765 43211", email: "s.sharma@example.com",  bloodGroup: "O+",  status: "Active",   fees: "Partial", attendance: 88 },
+  { id: 3, admissionNo: "EDN-2022-1410", name: "Rohan Kulkarni", dateOfBirth: "5 Jul 2012",  gender: "Male",   class: "6-C",  roll: 14, father: "Anil Kulkarni",   phone: "+91 98765 43212", email: "a.kulkarni@example.com",bloodGroup: "A+",  status: "Active",   fees: "Overdue", attendance: 72 },
+  { id: 4, admissionNo: "EDN-2020-1100", name: "Sneha Nair",     dateOfBirth: "18 Nov 2008", gender: "Female", class: "10-A", roll: 2,  father: "Vijay Nair",      phone: "+91 98765 43213", email: "v.nair@example.com",    bloodGroup: "B-",  status: "Inactive", fees: "Paid",    attendance: 91 },
+  { id: 5, admissionNo: "EDN-2022-1411", name: "Vikram Joshi",   dateOfBirth: "9 Sep 2011",  gender: "Male",   class: "8-B",  roll: 31, father: "Deepak Joshi",    phone: "+91 98765 43214", email: "d.joshi@example.com",   bloodGroup: "AB+", status: "Active",   fees: "Partial", attendance: 85 },
+  { id: 6, admissionNo: "EDN-2023-1560", name: "Neha Kulkarni",  dateOfBirth: "1 Feb 2012",  gender: "Female", class: "7-A",  roll: 9,  father: "Ramesh Kulkarni", phone: "+91 98765 43215", email: "r.kulkarni@example.com",bloodGroup: "O-",  status: "Active",   fees: "Paid",    attendance: 98 },
 ];
 
 const CLASSES = ["6-A","6-B","6-C","7-A","7-B","8-A","8-B","9-A","9-B","10-A","10-B","11-A","11-B"];
@@ -20,7 +20,7 @@ const BLOOD   = ["A+","A-","B+","B-","AB+","AB-","O+","O-"];
 const FEE_V    = { Paid: "success", Partial: "warning", Overdue: "danger" };
 const STATUS_V = { Active: "success", Inactive: "neutral", Suspended: "danger" };
 
-const EMPTY_FORM = { name: "", dob: "", gender: "Male", class: "9-A", roll: "", father: "", phone: "", email: "", blood: "B+", status: "Active", fees: "Paid", attendance: 100 };
+const EMPTY_FORM = { name: "", dateOfBirth: "", gender: "Male", class: "9-A", roll: "", father: "", phone: "", email: "", bloodGroup: "B+", status: "Active", fees: "Paid", attendance: 100 };
 
 /* ═══════════════════════════════════════════════════════════
    VIEW PROFILE MODAL
@@ -53,7 +53,7 @@ function StudentProfileModal({ student, onEdit, onClose }) {
               <p className="text-cobalt-light text-sm mt-0.5">
                 Class {student.class} &nbsp;·&nbsp; Roll {student.roll} &nbsp;·&nbsp; {student.gender}
               </p>
-              <p className="text-white/40 text-xs mt-0.5 font-mono">{student.admNo}</p>
+              <p className="text-white/40 text-xs mt-0.5 font-mono">{student.admissionNo}</p>
             </div>
             <button
               onClick={onClose}
@@ -80,7 +80,7 @@ function StudentProfileModal({ student, onEdit, onClose }) {
               <div className="text-white/50 text-[11px] mt-0.5">Enrolment</div>
             </div>
             <div>
-              <div className="text-white font-semibold">{student.blood}</div>
+              <div className="text-white font-semibold">{student.bloodGroup}</div>
               <div className="text-white/50 text-[11px]">Blood group</div>
             </div>
           </div>
@@ -95,10 +95,10 @@ function StudentProfileModal({ student, onEdit, onClose }) {
           </p>
           <div className="grid grid-cols-2 gap-x-6 gap-y-0 mb-5">
             {[
-              ["Date of birth", student.dob],
+              ["Date of birth", student.dateOfBirth],
               ["Gender",        student.gender],
-              ["Blood group",   student.blood],
-              ["Admission no.", student.admNo],
+              ["Blood group",   student.bloodGroup],
+              ["Admission no.", student.admissionNo],
             ].map(([label, value]) => (
               <div key={label} className="flex justify-between items-center py-2.5 border-b border-ink/5">
                 <span className="text-xs text-ink/40">{label}</span>
@@ -188,7 +188,7 @@ function StudentModal({ mode, initial, onSave, onClose }) {
   const validate = () => {
     const e = {};
     if (!form.name.trim())   e.name   = "Name is required";
-    if (!form.dob.trim())    e.dob    = "Date of birth is required";
+    if (!form.dateOfBirth.trim())    e.dateOfBirth    = "Date of birth is required";
     if (!form.roll)          e.roll   = "Roll number is required";
     if (!form.father.trim()) e.father = "Father's name is required";
     if (!form.phone.trim())  e.phone  = "Phone is required";
@@ -235,9 +235,9 @@ function StudentModal({ mode, initial, onSave, onClose }) {
 
               <div>
                 <label className="text-[10px] font-semibold text-ink/40 uppercase tracking-wide block mb-1.5">Date of birth *</label>
-                <input type="text" value={form.dob} placeholder="14 Aug 2010"
-                  onChange={(e) => set("dob", e.target.value)} className={inputCls("dob")} />
-                {errors.dob && <p className="text-[11px] text-rose mt-1">{errors.dob}</p>}
+                <input type="text" value={form.dateOfBirth} placeholder="14 Aug 2010"
+                  onChange={(e) => set("dateOfBirth", e.target.value)} className={inputCls("dateOfBirth")} />
+                {errors.dateOfBirth && <p className="text-[11px] text-rose mt-1">{errors.dateOfBirth}</p>}
               </div>
 
               <div>
@@ -249,7 +249,7 @@ function StudentModal({ mode, initial, onSave, onClose }) {
 
               <div>
                 <label className="text-[10px] font-semibold text-ink/40 uppercase tracking-wide block mb-1.5">Blood group</label>
-                <select value={form.blood} onChange={(e) => set("blood", e.target.value)} className={inputCls("blood")}>
+                <select value={form.bloodGroup} onChange={(e) => set("bloodGroup", e.target.value)} className={inputCls("bloodGroup")}>
                   {BLOOD.map((o) => <option key={o}>{o}</option>)}
                 </select>
               </div>
@@ -403,7 +403,7 @@ export default function StudentsPage() {
     const newStudent = {
       ...form,
       id: Date.now(),
-      admNo: `EDN-2026-${Math.floor(1600 + Math.random() * 400)}`,
+      admissionNo: `EDN-2026-${Math.floor(1600 + Math.random() * 400)}`,
       roll: Number(form.roll),
       attendance: Number(form.attendance) || 100,
     };
@@ -504,7 +504,7 @@ export default function StudentsPage() {
               {filtered.map((s) => (
                 <tr key={s.id} className="hover:bg-parchment/40 transition-colors group">
                   <Td>
-                    <span className="font-mono text-xs text-ink/40">{s.admNo}</span>
+                    <span className="font-mono text-xs text-ink/40">{s.admissionNo}</span>
                   </Td>
                   <Td>
                     <div className="flex items-center gap-2.5">

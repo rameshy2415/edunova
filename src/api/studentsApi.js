@@ -10,13 +10,16 @@ export const studentsApi = {
   // ── Core CRUD ──────────────────────────────────────────────
 
   /** GET /students?page=1&limit=20&class=9A&search=aryan */
+  getAllStudents: (schoolId) => axiosInstance.get(`/admin/students/list/${schoolId}`),
+
+  /** GET /students?page=1&limit=20&class=9A&search=aryan */
   getAll: (params) => axiosInstance.get("/students", { params }),
 
   /** GET /students/:id */
-  getById: (id) => axiosInstance.get(`/students/${id}`),
+  getById: (id) => axiosInstance.get(`/admin/students/${id}`),
 
   /** POST /students  — Admin only */
-  create: (payload) => axiosInstance.post("/students", payload),
+  create: (payload) => axiosInstance.post("/admin/students", payload),
 
   /** PUT /students/:id */
   update: (id, payload) => axiosInstance.put(`/students/${id}`, payload),

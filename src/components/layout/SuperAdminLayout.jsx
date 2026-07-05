@@ -80,7 +80,7 @@ export default function SuperAdminLayout() {
               <NavLink
                 key={item.path}
                 to={item.path}
-                end={item.path.endsWith("dashboard")}
+                end
                 onClick={() => setSidebarOpen(false)}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium mb-0.5 transition-all ${

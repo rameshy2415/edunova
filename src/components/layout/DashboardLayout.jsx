@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 
 /* ── Nav config per role ─────────────────────────────────── */
 const NAV_CONFIG = {
-  admin: [
+  SCHOOL_ADMIN: [
     {
       section: "Main",
       items: [
@@ -80,14 +80,14 @@ function NavIcon({ name }) {
 }
 
 const ROLE_COLORS = {
-  admin:   "bg-cobalt text-white",
+  SCHOOL_ADMIN:   "bg-cobalt text-white",
   teacher: "bg-sage text-white",
   student: "bg-amber text-white",
   parent:  "bg-rose text-white",
 };
 
 const ROLE_ACCENT = {
-  admin:   "bg-cobalt",
+  SCHOOL_ADMIN:   "bg-cobalt",
   teacher: "bg-sage",
   student: "bg-amber",
   parent:  "bg-rose",
@@ -100,9 +100,7 @@ export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const sections = NAV_CONFIG[role] || [];
-  const initials = user?.name
-    ? user.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
-    : "??";
+  const initials = user?.name? user.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase(): "??";
 
   const handleLogout = async () => {
     await logout();

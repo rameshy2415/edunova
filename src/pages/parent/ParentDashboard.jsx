@@ -7,7 +7,7 @@ const CHILD = {
   name: "Aryan Mehta",
   class: "9-A",
   roll: 21,
-  dob: "14 Aug 2010",
+  dateOfBirth: "14 Aug 2010",
   bloodGroup: "B+",
   attendance: 96,
   avgGrade: 78,
@@ -56,7 +56,7 @@ export default function ParentDashboard() {
             <div className="font-serif text-xl text-white">{CHILD.name}</div>
             <div className="text-cobalt-light text-sm mt-0.5">Class {CHILD.class} · Roll #{CHILD.roll}</div>
             <div className="flex items-center gap-3 mt-2">
-              <span className="text-xs text-white/60">DOB: {CHILD.dob}</span>
+              <span className="text-xs text-white/60">DOB: {CHILD.dateOfBirth}</span>
               <span className="text-xs text-white/60">Blood: {CHILD.bloodGroup}</span>
             </div>
           </div>

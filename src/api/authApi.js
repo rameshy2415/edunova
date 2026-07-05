@@ -22,6 +22,40 @@ export const authApi = {
    */
   logout: () => axiosInstance.post("/auth/logout"),
 
+    /**
+   * POST /auth/refresh
+   * Body: { refreshToken }
+   * Returns: new token pair
+   */
+  refresh: (refreshToken) =>
+    axiosInstance.post("/auth/refresh", { refreshToken }),
+ 
+  /**
+   * GET /auth/validate-token?token=<token>
+   *
+   * Call this BEFORE rendering the set-password form.
+   * Returns: { email, schoolName, isFirstTime, expiresAt }
+   *
+   * Throws 422 if token is invalid or expired.
+   */
+  validateToken: (token) =>
+    axiosInstance.get("/auth/validate-token", { params: { token } }),
+
+
+    /**
+   * POST /auth/set-password
+   * Body: { token, newPassword, confirmPassword }
+   *
+   * Handles BOTH:
+   *   - First-time admin password setup (isFirstTime = true)
+   *   - Regular forgot-password reset   (isFirstTime = false)
+   *
+   * Returns: { accessToken, refreshToken, user }
+   * — auto-logs the user in on success.
+   */
+  setPassword: (payload) =>
+    axiosInstance.post("/auth/set-password", payload),
+
   /**
    * POST /auth/forgot-password
    * Body: { email }

@@ -3,7 +3,7 @@ import { PageHeader, Card, CardHeader, Badge, Table, Th, Td } from "../../compon
 
 const CHILD = {
   name: "Aryan Mehta", class: "9-A", roll: 21, section: "A",
-  dob: "14 Aug 2010", age: "15 years", bloodGroup: "B+",
+  dateOfBirth: "14 Aug 2010", age: "15 years", bloodGroup: "B+",
   gender: "Male", nationality: "Indian", motherTongue: "Hindi",
   admissionNo: "EDN-2021-1284", admissionDate: "3 Jun 2021",
   house: "Tagore House", classTeacher: "Ms. D'Souza",
@@ -80,7 +80,7 @@ export default function ParentChildInfo() {
             <div className="space-y-0">
               {[
                 ["Full name",        CHILD.name],
-                ["Date of birth",    CHILD.dob],
+                ["Date of birth",    CHILD.dateOfBirth],
                 ["Age",              CHILD.age],
                 ["Gender",           CHILD.gender],
                 ["Blood group",      CHILD.bloodGroup],

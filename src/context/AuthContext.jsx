@@ -34,9 +34,10 @@ export function AuthProvider({ children }) {
    * Returns the user object so caller can redirect by role.
    */
   const login = useCallback(async (credentials) => {
-    //const { data } = await authApi.login(credentials);
-    const { data } ={data: { token: "string", user: { id:1, name:"Admin Principal", email: credentials.email, role: credentials.role } }}; 
+    const { data } = await authApi.login(credentials);
+    //const { data } ={data: { token: "string", user: { id:1, name:"Admin Principal", email: credentials.email, role: credentials.role } }}; 
     localStorage.setItem("edunova_token", data.token);
+    localStorage.setItem("refreshToken", data.refreshToken);
     localStorage.setItem("edunova_user", JSON.stringify(data.user));
     setToken(data.token);
     setUser(data.user);
@@ -51,6 +52,7 @@ export function AuthProvider({ children }) {
       // swallow — clear locally regardless
     } finally {
       localStorage.removeItem("edunova_token");
+      localStorage.removeItem("refreshToken");
       localStorage.removeItem("edunova_user");
       setToken(null);
       setUser(null);
@@ -71,6 +73,8 @@ export function AuthProvider({ children }) {
     token,                         // raw JWT
     role: user?.role ?? null,      // "superadmin" | "admin" | "teacher" | "student" | "parent"
     schoolId: user?.schoolId ?? null, // null for superadmin
+    academicYearId: user?.academicYearId ?? null, // null for superadmin
+    section: user?.section ?? null, // null for superadmin
     isAuthenticated: !!token,
     isSuperAdmin: user?.role === "superadmin",
     login,
