@@ -98,14 +98,14 @@ export default function StudentDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation(); // React Router hook
-  const isEditMode = location.pathname.includes("/edit");
+  //const isEditMode = location.pathname.includes("/edit");
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [student, setStudent] = useState(null);
-  const [editData, setEditData] = useState(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  // const [editData, setEditData] = useState(null);
+  // const [isSaving, setIsSaving] = useState(false);
+  // const [saveSuccess, setSaveSuccess] = useState(false);
 
   const [tab, setTab] = useState("Overview");
 
@@ -117,11 +117,11 @@ export default function StudentDetail() {
     setLoading(true);
     try {
       const { data } = await studentsApi.getById(id);
-      console.log(data);
-      setStudent(data);
-      if (isEditMode) {
-        setEditData({ ...data });
-      }
+      console.log(data.content);
+      setStudent(data?.content?.student);
+      // if (isEditMode) {
+      //   setEditData({ ...response.data });
+      // }
     } catch (err) {
       console.log(err);
       setError(

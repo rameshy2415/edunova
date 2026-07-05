@@ -44,7 +44,7 @@ const EMPTY = {
   dateOfBirth: "",
   gender: "Male",
   bloodGroup: "B+",
-  studentClass: "9-A",
+  grade: "9-A",
   roll: "",
   section: "A",
   status: "Active",
@@ -67,7 +67,7 @@ export default function StudentForm() {
   const { id } = useParams(); // present on edit, absent on new
   const navigate = useNavigate();
   const isEdit = Boolean(id);
-  const { schoolId, academicYearId, section } = useAuth();
+  const { schoolId, academicYearId } = useAuth();
 
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
@@ -75,7 +75,8 @@ export default function StudentForm() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [student, setStudent] = useState(null);
+  const [grade, setGrade] = useState([]);
+  const [section, setSection] = useState([]);
 
   /* Pre-fill for edit mode */
   useEffect(() => {
@@ -88,31 +89,36 @@ export default function StudentForm() {
     setLoading(true);
     try {
       const { data } = await studentsApi.getById(id);
-      console.log(data);
-      setStudent(data);
+      console.log(data?.content);
+      const studentData = data?.content?.student;
+      setGrade(data?.content?.grades || []);
+      const selectedGrade = data?.content?.grades.find(g => g.id === studentData.grade);
+      const selectedSections = selectedGrade?.sections || [];
+      setSection(selectedSections);
       setForm({
-        name: data.name,
-        dateOfBirth: data.dateOfBirth,
-        gender: data.gender,
-        bloodGroup: data.bloodGroup,
-        studentClass: data.studentClass,
-        roll: String(data.roll),
-        section: data.section || "A",
-        status: data.status,
-        fees: data.fees,
-        nationality: data.nationality || "Indian",
-        religion: data.religion || "",
-        category: data.category || "General",
-        house: data.house || "",
-        previousSchool: data.previousSchool || "",
-        father: data.father,
-        mother: data.mother || "",
-        phone: data.phone,
-        altPhone: data.altPhone || "",
-        email: data.email || "",
-        address: data.address || "",
-        emergencyContact: data.emergencyContact || "",
+        name: studentData.name,
+        dateOfBirth: studentData.dateOfBirth,
+        gender: studentData.gender,
+        bloodGroup: studentData.bloodGroup,
+        grade: studentData.grade,
+        roll: String(studentData.roll),
+        section: studentData.section || "A",
+        status: studentData.status,
+        fees: studentData.fees,
+        nationality: studentData.nationality || "Indian",
+        religion: studentData.religion || "",
+        category: studentData.category || "General",
+        house: studentData.house || "",
+        previousSchool: studentData.previousSchool || "",
+        father: studentData.father,
+        mother: studentData.mother || "",
+        phone: studentData.phone,
+        altPhone: studentData.altPhone || "",
+        email: studentData.email || "",
+        address: studentData.address || "",
+        emergencyContact: studentData.emergencyContact || "",
       });
+      
     } catch (err) {
       console.log(err);
       setError(
@@ -354,14 +360,14 @@ if (loading)
           {/* ── Section 2: Academic ── */}
           <Card>
             <FormSection title="Academic details">
-              <FormField label="Class">
+              <FormField label="Grade">
                 <select
-                  value={form.studentClass}
-                  onChange={(e) => set("studentClass", e.target.value)}
+                  value={form.grade}
+                  onChange={(e) => set("grade", e.target.value)}
                   className={selectCls}
                 >
-                  {CLASSES.map((o) => (
-                    <option key={o}>{o}</option>
+                  {grade.map((o) => (
+                    <option key={o.id}  value={o.id}>{o.displayName}</option>
                   ))}
                 </select>
               </FormField>
@@ -382,8 +388,8 @@ if (loading)
                   onChange={(e) => set("section", e.target.value)}
                   className={selectCls}
                 >
-                  {["A", "B", "C", "D"].map((o) => (
-                    <option key={o}>{o}</option>
+                  {section.map((o) => (
+                    <option key={o.id} value={o.id}>{o.displayName}</option>
                   ))}
                 </select>
               </FormField>
