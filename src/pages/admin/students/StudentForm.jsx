@@ -91,8 +91,8 @@ export default function StudentForm() {
       const { data } = await studentsApi.getById(id);
       console.log(data?.content);
       const studentData = data?.content?.student;
-      setGrade(data?.content?.grades || []);
-      const selectedGrade = data?.content?.grades.find(g => g.id === studentData.grade);
+      setGrade(data?.content?.grade || []);
+      const selectedGrade = data?.content?.grade.find(g => g.id === studentData.grade);
       const selectedSections = selectedGrade?.sections || [];
       setSection(selectedSections);
       setForm({
@@ -131,6 +131,13 @@ export default function StudentForm() {
   };
 
   const set = (k, v) => {
+    
+    if (k === "grade") {
+      const selectedGrade = grade.find((g) => g.id === v);
+      const selectedSections = selectedGrade?.sections || [];
+      setSection(selectedSections);
+    }
+
     setForm((p) => ({ ...p, [k]: v }));
     setErrors((p) => ({ ...p, [k]: "" })); // clear field error on change
   };
