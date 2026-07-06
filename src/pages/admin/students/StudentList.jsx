@@ -44,7 +44,7 @@ export default function StudentList() {
 
   const filtered = students.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase()) &&
-    (classF  === "All" || s.grade  === classF) &&
+    (classF  === "All" || s.section  === classF) &&
     (feeF    === "All" || s.fees   === feeF) &&
     (statusF === "All" || s.status === statusF)
   );
@@ -215,7 +215,7 @@ export default function StudentList() {
 
                   <Td>
                     <span className="text-xs bg-cobalt-light text-cobalt px-2 py-0.5 rounded-full">
-                      {s.grade}
+                      {s.section}
                     </span>
                   </Td>
                   <Td>{s.roll}</Td>

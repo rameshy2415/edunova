@@ -255,7 +255,7 @@ export default function StudentDetail() {
               {student.name}
             </h1>
             <p className="text-cobalt-light text-sm mt-0.5">
-              Class {student.class} &nbsp;·&nbsp; Roll {student.roll}{" "}
+              Class {student.section} &nbsp;·&nbsp; Roll {student.roll}{" "}
               &nbsp;·&nbsp; {student.gender}
             </p>
             <p className="text-white/40 text-xs mt-1 font-mono">
@@ -467,7 +467,7 @@ export default function StudentDetail() {
           <Card>
             <CardHeader title="Academic info" />
             {[
-              ["Class", student.class],
+              ["Class", student.section],
               ["Roll no.", student.roll],
               ["Section", student.section],
               ["House", student.house],

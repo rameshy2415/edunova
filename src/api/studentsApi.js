@@ -40,15 +40,14 @@ export const studentsApi = {
   // ── Grades ─────────────────────────────────────────────────
 
   /** GET /students/:id/grades?term=1 */
-  getGrades: (id, params) =>
-    axiosInstance.get(`/students/${id}/grades`, { params }),
+  getGrades: (id) => axiosInstance.get(`/admin/students/${id}/grades`),
 
   /** POST /students/:id/grades */
   addGrade: (id, payload) =>
-    axiosInstance.post(`/students/${id}/grades`, payload),
+    axiosInstance.post(`/admin/students/${id}/grades`, payload),
 
   // ── Fees ───────────────────────────────────────────────────
 
   /** GET /students/:id/fees */
-  getFees: (id) => axiosInstance.get(`/students/${id}/fees`),
+  getFees: (id) => axiosInstance.get(`/admin/students/${id}/fees`),
 };

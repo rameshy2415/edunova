@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { PageHeader, Card, Button, Alert, Spinner } from "../../../components/common";
+import {
+  PageHeader,
+  Card,
+  Button,
+  Alert,
+  Spinner,
+} from "../../../components/common";
 import { STUDENTS, CLASSES, BLOOD_GROUPS } from "./data";
 import { studentsApi } from "../../../api/studentsApi";
 import { useAuth } from "../../../context/AuthContext";
@@ -44,9 +50,9 @@ const EMPTY = {
   dateOfBirth: "",
   gender: "Male",
   bloodGroup: "B+",
-  grade: "9-A",
+  grade: "",
   roll: "",
-  section: "A",
+  section: "",
   status: "Active",
   fees: "Paid",
   nationality: "Indian",
@@ -82,6 +88,8 @@ export default function StudentForm() {
   useEffect(() => {
     if (isEdit) {
       getStudentDetails();
+    } else {
+      getGrades();
     }
   }, [id, isEdit]);
 
@@ -92,7 +100,9 @@ export default function StudentForm() {
       console.log(data?.content);
       const studentData = data?.content?.student;
       setGrade(data?.content?.grade || []);
-      const selectedGrade = data?.content?.grade.find(g => g.id === studentData.grade);
+      const selectedGrade = data?.content?.grade.find(
+        (g) => g.id === studentData.grade,
+      );
       const selectedSections = selectedGrade?.sections || [];
       setSection(selectedSections);
       setForm({
@@ -118,7 +128,6 @@ export default function StudentForm() {
         address: studentData.address || "",
         emergencyContact: studentData.emergencyContact || "",
       });
-      
     } catch (err) {
       console.log(err);
       setError(
@@ -130,8 +139,29 @@ export default function StudentForm() {
     }
   };
 
+  const getGrades = async () => {
+    setLoading(true);
+    try {
+      const { data } = await studentsApi.getGrades(schoolId);
+      console.log(data?.content);
+      setGrade(data?.content?.grade || []);
+      /*       const selectedGrade = data?.content?.grade.find(
+        (g) => g.id === studentData.grade,
+      );
+      const selectedSections = selectedGrade?.sections || [];
+      setSection(selectedSections); */
+    } catch (err) {
+      console.log(err);
+      setError(
+        err.message ||
+          "Failed while fetching grades details. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const set = (k, v) => {
-    
     if (k === "grade") {
       const selectedGrade = grade.find((g) => g.id === v);
       const selectedSections = selectedGrade?.sections || [];
@@ -155,13 +185,19 @@ export default function StudentForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Form data to submit:", form);
     if (!validate()) return;
     try {
       setLoading(true);
       setSaving(true);
+      setError("");
       //Need to add schoolId to the form data before sending it to the API
       //const formData = { ...form, schoolId, academicYearId, section };
-      const formData = { ...form, schoolId, academicYearId:'455093b0-27b5-4b4d-ab30-5eb1f684c653', section:'0deae464-a0ff-4855-95ab-a0a0b0aacce2' };
+      const formData = {
+        ...form,
+        schoolId,
+        academicYearId: "455093b0-27b5-4b4d-ab30-5eb1f684c653",
+      };
       // await
       isEdit
         ? await studentsApi.update(id, formData)
@@ -171,15 +207,16 @@ export default function StudentForm() {
         () => navigate(isEdit ? `/admin/students/${id}` : "/admin/students"),
         800,
       );
+      setSaved(true);
     } catch (err) {
       console.log(err);
       setError(
         err.message || "Failed while saving student details. Please try again.",
       );
+      setSaved(false);
     } finally {
       setLoading(false);
       setSaving(false);
-      setSaved(true);
     }
 
     // setTimeout(() => {
@@ -200,16 +237,15 @@ export default function StudentForm() {
   const selectCls =
     "w-full bg-white border border-ink/12 rounded-xl px-3 py-2.5 text-sm text-ink outline-none focus:border-cobalt focus:ring-2 focus:ring-cobalt/10 transition-all cursor-pointer";
 
-
-if (loading)
-  return (
-    <div className="flex items-center justify-center h-[calc(100vh-8rem)] overflow-hidden gap-4">
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <Spinner />
-        <p className="font-serif text-lg text-ink/40">Loading...</p>
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-8rem)] overflow-hidden gap-4">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Spinner />
+          <p className="font-serif text-lg text-ink/40">Loading...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
 
   return (
     <div className="space-y-5">
@@ -254,6 +290,24 @@ if (loading)
             : "Fill in the details to enrol a new student"
         }
       />
+
+      {/* ── Show API error ── */}
+      {error && (
+        <div className="flex items-center gap-2 bg-rose-light text-rose text-xs px-4 py-3 rounded-xl">
+          <svg
+            className="w-4 h-4 flex-shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          {error}
+        </div>
+      )}
 
       {saved && (
         <Alert variant="success">
@@ -374,7 +428,9 @@ if (loading)
                   className={selectCls}
                 >
                   {grade.map((o) => (
-                    <option key={o.id}  value={o.id}>{o.displayName}</option>
+                    <option key={o.id} value={o.id}>
+                      {o.displayName}
+                    </option>
                   ))}
                 </select>
               </FormField>
@@ -396,7 +452,9 @@ if (loading)
                   className={selectCls}
                 >
                   {section.map((o) => (
-                    <option key={o.id} value={o.id}>{o.displayName}</option>
+                    <option key={o.id} value={o.id}>
+                      {o.displayName}
+                    </option>
                   ))}
                 </select>
               </FormField>
