@@ -198,7 +198,7 @@ export default function StudentForm() {
       const formData = {
         ...form,
         schoolId,
-        academicYearId: "455093b0-27b5-4b4d-ab30-5eb1f684c653",
+        academicYearId,
       };
       // await
       isEdit
