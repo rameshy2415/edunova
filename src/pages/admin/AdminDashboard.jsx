@@ -64,7 +64,7 @@ export default function AdminDashboard() {
         subtitle={`${today} · Academic Year 2025–26`}
         actions={
           <button
-            onClick={() => navigate("/admin/students")}
+            onClick={() => navigate("/admin/students/new")}
             className="text-sm font-medium bg-cobalt text-white px-4 py-2 rounded-xl hover:bg-cobalt/90 transition-all"
           >
             + Add student

@@ -144,12 +144,14 @@ export default function StudentForm() {
     try {
       const { data } = await studentsApi.getGrades(schoolId);
       console.log(data?.content);
-      setGrade(data?.content?.grade || []);
-      /*       const selectedGrade = data?.content?.grade.find(
-        (g) => g.id === studentData.grade,
-      );
+      const tempGrade = data?.content?.grade || [];
+      setGrade(tempGrade);
+      set("grade", tempGrade[0]?.id);
+      const selectedGrade = tempGrade.find((g) => g.id === tempGrade[0]?.id);
       const selectedSections = selectedGrade?.sections || [];
-      setSection(selectedSections); */
+      setSection(selectedSections);
+      set("section", selectedSections[0]?.id);
+    
     } catch (err) {
       console.log(err);
       setError(

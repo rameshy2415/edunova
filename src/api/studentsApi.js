@@ -13,7 +13,7 @@ export const studentsApi = {
   getAllStudents: (schoolId) => axiosInstance.get(`/admin/students/list/${schoolId}`),
 
   /** GET /students?page=1&limit=20&class=9A&search=aryan */
-  getAll: (params) => axiosInstance.get("/students", { params }),
+  getAll: (params) => axiosInstance.get("/admin/students", { params }),
 
   /** GET /students/:id */
   getById: (id) => axiosInstance.get(`/admin/students/${id}`),
@@ -22,20 +22,20 @@ export const studentsApi = {
   create: (payload) => axiosInstance.post("/admin/students", payload),
 
   /** PUT /students/:id */
-  update: (id, payload) => axiosInstance.put(`/students/${id}`, payload),
+  update: (id, payload) => axiosInstance.put(`/admin/students/${id}`, payload),
 
   /** DELETE /students/:id — Admin only */
-  remove: (id) => axiosInstance.delete(`/students/${id}`),
+  remove: (id) => axiosInstance.delete(`/admin/students/${id}`),
 
   // ── Attendance ─────────────────────────────────────────────
 
   /** GET /students/:id/attendance?month=4&year=2026 */
   getAttendance: (id, params) =>
-    axiosInstance.get(`/students/${id}/attendance`, { params }),
+    axiosInstance.get(`/admin/students/${id}/attendance`, { params }),
 
   /** POST /students/attendance/bulk — Teacher marks whole class */
   markBulkAttendance: (payload) =>
-    axiosInstance.post("/students/attendance/bulk", payload),
+    axiosInstance.post("/admin/students/attendance/bulk", payload),
 
   // ── Grades ─────────────────────────────────────────────────
 

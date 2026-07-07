@@ -39,6 +39,7 @@ import FeesPage          from "../pages/admin/FeesPage";
 import ReportsPage       from "../pages/admin/ReportsPage";
 import TimetablePage     from "../pages/admin/TimetablePage";
 import AttendancePage    from "../pages/admin/AttendancePage";
+import AttendanceModule    from "../pages/admin/AttendanceModule";
 import SettingsPage      from "../pages/admin/SettingsPage";
 
 // ── Student sub-pages (routed CRUD) ───────────────────────────────────────
@@ -187,6 +188,7 @@ export default function AppRoutes() {
         <Route path="reports" element={<ReportsPage />} />
         <Route path="timetable" element={<TimetablePage />} />
         <Route path="attendance" element={<AttendancePage />} />
+        <Route path="view-attendance" element={<AttendanceModule />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
 
