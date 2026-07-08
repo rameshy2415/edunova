@@ -29,13 +29,14 @@ export const studentsApi = {
 
   // ── Attendance ─────────────────────────────────────────────
 
+   /** GET /students/:id/attendance?month=4&year=2026 */
+  getSectionStudent: () => axiosInstance.get('/admin/attendance'),
+
   /** GET /students/:id/attendance?month=4&year=2026 */
-  getAttendance: (id, params) =>
-    axiosInstance.get(`/admin/students/${id}/attendance`, { params }),
+  getAttendance: (id, params) => axiosInstance.get(`/admin/students/${id}/attendance`, { params }),
 
   /** POST /students/attendance/bulk — Teacher marks whole class */
-  markBulkAttendance: (payload) =>
-    axiosInstance.post("/admin/students/attendance/bulk", payload),
+  markBulkAttendance: (payload) => axiosInstance.post("/admin/students/attendance/bulk", payload),
 
   // ── Grades ─────────────────────────────────────────────────
 
@@ -43,8 +44,7 @@ export const studentsApi = {
   getGrades: (id) => axiosInstance.get(`/admin/students/${id}/grades`),
 
   /** POST /students/:id/grades */
-  addGrade: (id, payload) =>
-    axiosInstance.post(`/admin/students/${id}/grades`, payload),
+  addGrade: (id, payload) => axiosInstance.post(`/admin/students/${id}/grades`, payload),
 
   // ── Fees ───────────────────────────────────────────────────
 
