@@ -20,6 +20,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { studentsApi } from "../../api/studentsApi";
+import SectionAttendanceStatus from "./SectionAttendanceStatus";
 
 //const CLASSES = ["6-A", "6-B", "6-C", "7-A", "7-B", "8-A", "8-B", "9-A", "9-B", "10-A", "10-B", "11-A", "11-B"];
 
@@ -50,6 +51,7 @@ const VIEWS = [
   { key: "weekly", label: "Weekly" },
   { key: "monthly", label: "Monthly" },
   { key: "yearly", label: "Yearly" },
+  { key: "status", label: "Section status" },   // new
 ];
 
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -732,7 +734,7 @@ export default function AttendancePage() {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="font-serif text-lg font-semibold text-ink">
-                    Week overview — {selectedClass}
+                    Week overview — {section.find((g) => g.id === selectedClass).name}
                   </h3>
                   <p className="text-xs text-ink/40 mt-0.5">
                     Click any day to see who was present or absent
@@ -816,7 +818,7 @@ export default function AttendancePage() {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="font-serif text-lg font-semibold text-ink">
-                    Daily attendance % — {selectedClass}
+                    Daily attendance % — {section.find((g) => g.id === selectedClass).name}
                   </h3>
                   <p className="text-xs text-ink/40 mt-0.5">
                     Click any day on the heat map to see who was present or
@@ -910,7 +912,7 @@ export default function AttendancePage() {
             <>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-serif text-lg font-semibold text-ink">
-                  Month-wise attendance % — {selectedClass}
+                  Month-wise attendance % — {section.find((g) => g.id === selectedClass).name}
                 </h3>
                 <select
                   value={selectedClass}
@@ -963,6 +965,10 @@ export default function AttendancePage() {
                 </BarChart>
               </ResponsiveContainer>
             </>
+          )}
+
+          {view === "status" && (
+            <SectionAttendanceStatus sections={section} fetchStatus={studentsApi.getSectionAttendanceStatus} />
           )}
         </Card>
 
