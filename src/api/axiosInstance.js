@@ -77,6 +77,7 @@ axiosInstance.interceptors.response.use(
     console.log(error);
     const originalRequest = error.config;
     const status = error.response?.status;
+    const code = error.response?.data?.code;//TOKEN_EXPIRED
 
     // Skip refresh for the refresh endpoint itself (avoid infinite loop)
     if (originalRequest.url?.includes("/auth/refresh")) {
@@ -95,7 +96,7 @@ axiosInstance.interceptors.response.use(
     }
 
     // Handle 401 — token expired
-    if (status === 401 && !originalRequest._retry) {
+    if (status === 401 && code === "TOKEN_EXPIRED" && !originalRequest._retry) {
       // If a refresh is already in progress, queue this request
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
