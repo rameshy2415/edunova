@@ -36,7 +36,7 @@ export const studentsApi = {
   getAttendance: (id, params) => axiosInstance.get(`/admin/students/${id}/attendance`, { params }),
 
   /** POST /students/attendance/bulk — Teacher marks whole class */
-  markBulkAttendance: (payload) => axiosInstance.post("/admin/students/attendance/bulk", payload),
+  markBulkAttendance: (payload) => axiosInstance.post("/admin/attendance/mark", payload),
 
   // ── Grades ─────────────────────────────────────────────────
 

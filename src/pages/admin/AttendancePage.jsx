@@ -5,6 +5,7 @@ import {
   CardHeader,
   Badge,
   Button,
+  Spinner
 } from "../../components/common";
 import {
   ResponsiveContainer,
@@ -84,12 +85,22 @@ const CHART = {
 function seededPct(seed) {
   return Math.abs(Math.sin(seed) * 10000) % 1;
 }
+
+const statusMap = {
+    P: "PRESENT",
+    A: "ABSENT",
+    L: "LATE",
+    H: "HOLIDAY",
+    LV: "LEAVE",
+};
+
 function seededStatus(seed) {
   const r = seededPct(seed);
   if (r > 0.93) return "A";
   if (r > 0.85) return "L";
   return "P";
 }
+
 function classSeed(cls) {
   return cls.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
 }
@@ -141,11 +152,13 @@ function startOfWeek(d) {
   date.setDate(diff);
   return date;
 }
+
 function addDays(d, n) {
   const date = new Date(d);
   date.setDate(date.getDate() + n);
   return date;
 }
+
 function fmtDate(d) {
   return d.toLocaleDateString("en-IN", {
     weekday: "long",
@@ -286,6 +299,10 @@ export default function AttendancePage() {
 
   const [attendance, setAttendance] = useState({});
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const [view, setView] = useState("daily");
 
   const [dayDetail, setDayDetail] = useState(null);
@@ -301,7 +318,7 @@ export default function AttendancePage() {
   }, []);
 
   const getStudents = async () => {
-    //setLoading(true);
+    setLoading(true);
     try {
       const { data } = await studentsApi.getSectionStudent();
       console.log(data);
@@ -315,11 +332,11 @@ export default function AttendancePage() {
       setSelectedClass(defaultClass);
     } catch (err) {
       console.log(err);
-      /* setError(
+      setError(
           err.message || "Failed while fetching students. Please try again.",
-        ); */
+        );
     } finally {
-      //setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -363,23 +380,66 @@ export default function AttendancePage() {
   };
   const markAll = (val) => {
     const o = {};
-    students.forEach((s) => (o[s.id] = val));
+    filteredStudents.forEach((s) => (o[s.id] = val));
     setAttendance(o);
     setSaved(false);
   };
-  const presentCount = students.filter((s) => attendance[s.id] === "P").length;
-  const absentCount = students.filter((s) => attendance[s.id] === "A").length;
-  const unmarked = students.filter((s) => !attendance[s.id]).length;
+  const presentCount = filteredStudents.filter((s) => attendance[s.id] === "P").length;
+  const absentCount = filteredStudents.filter((s) => attendance[s.id] === "A").length;
+  const unmarked = filteredStudents.filter((s) => !attendance[s.id]).length;
 
-  const handleSave = () => {
+/*   const handleSave = () => {
+    console.log(attendance);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
+  }; */
+
+  const validate = () => {
+    if (!attendance || Object.keys(attendance).length === 0) {
+        alert("Please mark attendance before saving.");
+        return;
+    }
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    validate();
+    try {
+      setLoading(true);
+      setSaving(true);
+      setError("");
+
+      const records = Object.entries(attendance).map(([studentId, status]) => ({
+        studentId,
+        status: statusMap[status],
+        remarks: "",
+      }));
+      const payload = {
+        sectionId: selectedClass,
+        date: new Date().toISOString().split("T")[0],
+        records,
+      };
+      console.log("Form data to submit:", payload);
+      await studentsApi.markBulkAttendance(payload);
+      setSaved(true);
+      setTimeout(
+        () => setSaved(false),
+        800,
+      ); 
+    } catch (err) {
+      console.log(err);
+      setError(
+        err.message || "Failed to save attendance. Please try again.",
+      );
+      setSaved(false);
+    } finally {
+      setLoading(false);
+      setSaving(false);
+    }
   };
 
   const changeClass = (cls) => {
     setSelectedClass(cls);
-    //const student = students.filter((g) => g.sectionId === cls);
-    //setFilteredStudents(student);
     setAttendance({});
     setSaved(false);
     setQuery("");
@@ -413,10 +473,12 @@ export default function AttendancePage() {
     () => buildWeekMatrix(selectedClass, students),
     [selectedClass],
   );
+
   const monthTrend = useMemo(
     () => buildMonthTrend(selectedClass, students),
     [selectedClass],
   );
+
   const yearTrend = useMemo(
     () => buildYearTrend(selectedClass, students),
     [selectedClass],
@@ -499,6 +561,42 @@ export default function AttendancePage() {
         <Card className="lg:col-span-2">
           {view === "daily" && (
             <>
+              {/* ── Show API error ── */}
+              {error && (
+                <div className="mb-4 flex items-center gap-2 bg-rose-light text-rose text-xs px-4 py-3 rounded-xl">
+                  <svg
+                    className="w-4 h-4 flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  {error}
+                </div>
+              )}
+
+              {/* Panel — to show success message */}
+              {saved && (
+                <div className="my-2 flex items-center gap-2 bg-sage-light text-sage px-4 py-3 rounded-xl text-sm font-medium">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path d="M9 11l3 3L22 4" />
+                  </svg>
+                  Attendance saved successfully for class{" "}
+                  {section.find((g) => g.id === selectedClass).name}!
+                </div>
+              )}
+
+              {/* Panel — to select section */}
               <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
                 <div className="flex items-center gap-3">
                   <select
@@ -516,6 +614,7 @@ export default function AttendancePage() {
                     {filteredStudents.length} students
                   </span>
                 </div>
+
                 <div className="flex gap-2">
                   <button
                     onClick={() => markAll("P")}
@@ -563,7 +662,7 @@ export default function AttendancePage() {
                     <div
                       className="bg-sage transition-all"
                       style={{
-                        width: `${(presentCount / students.length) * 100}%`,
+                        width: `${(presentCount / filteredStudents.length) * 100}%`,
                       }}
                     />
                     <div
@@ -578,12 +677,18 @@ export default function AttendancePage() {
 
               {/* Student list */}
               <div className="space-y-2">
-                {filteredStudents.length === 0 && (
+                {loading && (
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <Spinner />
+                    <p className="font-serif text-lg text-ink/40">Loading...</p>
+                  </div>
+                )}
+                {!loading && filteredStudents.length === 0 && (
                   <p className="text-sm text-ink/40 text-center py-6">
                     No students match "{query}"
                   </p>
                 )}
-                {filteredStudents.map((s) => {
+                {!loading &&filteredStudents.map((s) => {
                   const val = attendance[s.id];
                   return (
                     <div
@@ -625,21 +730,6 @@ export default function AttendancePage() {
                   );
                 })}
               </div>
-
-              {saved && (
-                <div className="mt-4 flex items-center gap-2 bg-sage-light text-sage px-4 py-3 rounded-xl text-sm font-medium">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path d="M9 11l3 3L22 4" />
-                  </svg>
-                  Attendance saved successfully for class {selectedClass}!
-                </div>
-              )}
             </>
           )}
 
