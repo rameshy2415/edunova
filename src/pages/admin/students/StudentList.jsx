@@ -97,6 +97,24 @@ export default function StudentList() {
       </div>
 
       <Card padding={false}>
+        {/* ── Show API error ── */}
+        {error && (
+          <div className="my-2 mx-4 flex items-center gap-2 bg-rose-light text-rose text-xs px-4 py-3 rounded-xl">
+            <svg
+              className="w-4 h-4 flex-shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            {error}
+          </div>
+        )}
+
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-3 p-4 border-b border-ink/5">
           <div className="flex-1 min-w-44 flex items-center gap-2 bg-parchment border border-ink/10 rounded-xl px-3 py-2">

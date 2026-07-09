@@ -103,7 +103,7 @@ axiosInstance.interceptors.response.use(
         })
           .then((token) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
-            return api(originalRequest);
+            return axiosInstance(originalRequest);
           })
           .catch((err) => Promise.reject(err));
       }
