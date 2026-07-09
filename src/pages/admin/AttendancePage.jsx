@@ -291,18 +291,13 @@ function DayDetailModal({ detail, onClose }) {
 export default function AttendancePage() {
   const [selectedClass, setSelectedClass] = useState("");
   const [section, setSection] = useState([]);
-
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
-
   const [query, setQuery] = useState("");
-
   const [attendance, setAttendance] = useState({});
   const [saved, setSaved] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
   const [view, setView] = useState("daily");
 
   const [dayDetail, setDayDetail] = useState(null);
@@ -321,7 +316,6 @@ export default function AttendancePage() {
     setLoading(true);
     try {
       const { data } = await studentsApi.getSectionStudent();
-      console.log(data);
       const defaultClass = data?.content?.section?.[0]?.id || "";
       const defaultStudents =
         data?.content?.students?.filter((g) => g.sectionId === defaultClass) ||
@@ -340,15 +334,6 @@ export default function AttendancePage() {
     }
   };
 
-  /*     const handleSearch = (name) => {
-      setQuery(name);
-      const searchStudent = filteredStudents.filter((s) => s.name.toLowerCase().includes(name.toLowerCase()));
-      setFilteredStudents(searchStudent);
-    }; */
-
-  //const students = STUDENTS[selectedClass] || Array.from({ length: 5 }, (_, i) => ({ id: i + 1, roll: i + 1, name: `Student ${i + 1}`, avatar: "S" + (i + 1) }));
-  /*   let filteredStudents = students.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
-      filteredStudents = students.filter((g) => g.sectionId === selectedClass); */
 
   useEffect(() => {
     let result = students;
@@ -394,6 +379,16 @@ export default function AttendancePage() {
     setTimeout(() => setSaved(false), 3000);
   }; */
 
+  const getInitials = (name = "") => {
+    const words = name.trim().split(/\s+/);
+
+    if (words.length === 1) {
+      return words[0].slice(0, 2).toUpperCase();
+    }
+
+    return `${words[0][0]}${words[words.length - 1][0]}`.toUpperCase();
+  };
+
   const validate = () => {
     if (!attendance || Object.keys(attendance).length === 0) {
         alert("Please mark attendance before saving.");
@@ -406,7 +401,6 @@ export default function AttendancePage() {
     validate();
     try {
       setLoading(true);
-      setSaving(true);
       setError("");
 
       const records = Object.entries(attendance).map(([studentId, status]) => ({
@@ -434,7 +428,6 @@ export default function AttendancePage() {
       setSaved(false);
     } finally {
       setLoading(false);
-      setSaving(false);
     }
   };
 
@@ -701,7 +694,8 @@ export default function AttendancePage() {
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${val === "P" ? "bg-sage text-white" : val === "A" ? "bg-rose text-white" : "bg-cobalt-light text-cobalt"}`}
                       >
-                        {s.avatar}
+                        {/* {s.avatar} */}
+                        {getInitials(s.name)}
                       </div>
                       <span className="flex-1 text-sm font-medium text-ink">
                         {s.name}
