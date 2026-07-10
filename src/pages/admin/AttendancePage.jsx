@@ -51,7 +51,7 @@ const VIEWS = [
   { key: "weekly", label: "Weekly" },
   { key: "monthly", label: "Monthly" },
   { key: "yearly", label: "Yearly" },
-  { key: "status", label: "Section status" },   // new
+  { key: "status", label: "Attendance status" },   // new
 ];
 
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -441,6 +441,14 @@ export default function AttendancePage() {
     setDayDetail(null);
   };
 
+  const handleTabChange = (newView, sectionId) => {
+    setView(newView);
+    if(sectionId){
+      setSelectedClass(sectionId);
+    }
+    //setDayDetail(null);
+  };
+
   const openWeekDay = (dayIndex) => {
     const base = classSeed(selectedClass);
     const roster = dayRoster(
@@ -543,7 +551,7 @@ export default function AttendancePage() {
         {VIEWS.map((v) => (
           <button
             key={v.key}
-            onClick={() => setView(v.key)}
+            onClick={() => handleTabChange(v.key)}
             className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${view === v.key ? "bg-cobalt text-white" : "text-ink/50 hover:text-ink"}`}
           >
             {v.label}
@@ -968,7 +976,7 @@ export default function AttendancePage() {
           )}
 
           {view === "status" && (
-            <SectionAttendanceStatus sections={section} fetchStatus={studentsApi.getSectionAttendanceStatus} />
+            <SectionAttendanceStatus sections={section} fetchStatus={studentsApi.getAttendanceStatus} tabChange={handleTabChange} />
           )}
         </Card>
 

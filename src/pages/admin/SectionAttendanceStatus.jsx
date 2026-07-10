@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { PageHeader, Card, CardHeader, Badge, Button, Spinner } from "../../components/common";
+import { formatDayAndTime, formatDateTimeDay } from "../../utils/index"
 // import { studentsApi } from "../../api/studentsApi";
 
 /* ------------------------------------------------------------------------
@@ -21,7 +22,7 @@ import { PageHeader, Card, CardHeader, Badge, Button, Spinner } from "../../comp
        markedAt: "10:12 AM" | null,
        markedBy: "Priya Nair" | null,
        total, present, absent, late,
-       roster: [{ id, roll, name, status: "PRESENT"|"ABSENT"|"LATE" }]
+       records: [{ id, roll, name, status: "PRESENT"|"ABSENT"|"LATE" }]
      }]
 
    Until that endpoint exists, this component falls back to seeded demo data
@@ -50,17 +51,17 @@ function classSeed(cls) {
 }
 
 // Demo fallback: deterministically decides, per section/date, whether
-// attendance has been marked yet and generates a plausible roster if so.
+// attendance has been marked yet and generates a plausible records if so.
 function demoFetchStatus(date) {
   const dateSeed = new Date(date).getDate();
   return DEMO_SECTIONS.map((sec) => {
     const base = classSeed(sec.id) + dateSeed * 11;
     const marked = seededPct(base * 0.9) > 0.2; // most sections marked, a few pending
     if (!marked) {
-      return { sectionId: sec.id, sectionName: sec.name, marked: false, markedAt: null, markedBy: null, total: 0, present: 0, absent: 0, late: 0, roster: [] };
+      return { sectionId: sec.id, sectionName: sec.name, marked: false, markedAt: null, markedBy: null, total: 0, present: 0, absent: 0, late: 0, records: [] };
     }
     const total = 8;
-    const roster = Array.from({ length: total }, (_, i) => {
+    const records = Array.from({ length: total }, (_, i) => {
       const r = seededPct(base * 0.6 + i * 7.3);
       const status = r > 0.93 ? "ABSENT" : r > 0.85 ? "LATE" : "PRESENT";
       return { id: `${sec.id}-${i}`, roll: i + 1, name: DEMO_NAMES[i], status };
@@ -72,10 +73,10 @@ function demoFetchStatus(date) {
       markedAt: `${8 + (dateSeed % 2)}:${(base % 6) * 10 || "00"} AM`,
       markedBy: ["Priya Nair", "Ramesh Iyer", "Anjali Verma"][dateSeed % 3],
       total,
-      present: roster.filter((r) => r.status === "PRESENT").length,
-      absent: roster.filter((r) => r.status === "ABSENT").length,
-      late: roster.filter((r) => r.status === "LATE").length,
-      roster,
+      present: records.filter((r) => r.status === "PRESENT").length,
+      absent: records.filter((r) => r.status === "ABSENT").length,
+      late: records.filter((r) => r.status === "LATE").length,
+      records,
     };
   });
 }
@@ -98,14 +99,14 @@ function SectionRosterModal({ row, onClose }) {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between p-5 border-b border-ink/8">
           <div>
-            <p className="text-xs text-ink/40 mb-0.5">Marked by {row.markedBy} · {row.markedAt}</p>
+            <p className="text-xs text-ink/40 mb-0.5">Marked by {row.markedBy} · {formatDateTimeDay(row.markedAt)}</p>
             <h3 className="font-serif text-lg font-semibold text-ink">Section {row.sectionName}</h3>
           </div>
           <button onClick={onClose} className="text-ink/40 hover:text-ink w-8 h-8 rounded-lg hover:bg-parchment flex items-center justify-center">✕</button>
         </div>
         <div className="p-5 space-y-5">
           {groups.map(({ key, title, tone }) => {
-            const list = row.roster.filter((r) => r.status === key);
+            const list = row.records.filter((r) => r.status === key);
             if (list.length === 0) return null;
             const t = TONE[tone];
             return (
@@ -116,7 +117,7 @@ function SectionRosterModal({ row, onClose }) {
                 </div>
                 <div className="space-y-1.5">
                   {list.map((s) => (
-                    <div key={s.id} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-parchment/50">
+                    <div key={s.id} className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-parchment/50">
                       <span className="text-xs text-ink/40 font-mono w-6">{String(s.roll).padStart(2, "0")}</span>
                       <span className="text-sm text-ink">{s.name}</span>
                     </div>
@@ -131,7 +132,7 @@ function SectionRosterModal({ row, onClose }) {
   );
 }
 
-function SectionCard({ row, onView }) {
+function SectionCard({ row, onView, handleTabChange }) {
   if (!row.marked) {
     return (
       <div className="rounded-xl border border-dashed border-amber/30 bg-amber-light/30 p-4 flex flex-col justify-between min-h-[120px]">
@@ -142,7 +143,7 @@ function SectionCard({ row, onView }) {
           </div>
           <p className="text-xs text-ink/50">Attendance not marked yet</p>
         </div>
-        <Button size="sm" variant="ghost" className="mt-3 self-start">Mark now</Button>
+        <Button size="sm" variant="ghost" className="mt-3 self-start" onClick={() => handleTabChange("daily", row.sectionId)}>Mark now</Button>
       </div>
     );
   }
@@ -154,7 +155,7 @@ function SectionCard({ row, onView }) {
         <span className="text-sm font-semibold text-ink">{row.sectionName}</span>
         <Badge variant="sage">Marked</Badge>
       </div>
-      <p className="text-xs text-ink/40 mb-2.5">{row.markedAt} · {row.markedBy}</p>
+      <p className="text-xs text-ink/40 mb-2.5">{formatDayAndTime(row.markedAt)} · {row.markedBy}</p>
       <div className="flex items-center gap-3 text-xs">
         <span className="text-sage font-medium">{row.present} present</span>
         {row.absent > 0 && <span className="text-rose font-medium">{row.absent} absent</span>}
@@ -167,7 +168,8 @@ function SectionCard({ row, onView }) {
   );
 }
 
-export default function SectionAttendanceStatus({ sections = DEMO_SECTIONS, fetchStatus }) {
+export default function SectionAttendanceStatus({ sections = DEMO_SECTIONS, fetchStatus, tabChange }) {
+  console.log("SectionAttendanceStatus render",  sections); 
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -175,14 +177,17 @@ export default function SectionAttendanceStatus({ sections = DEMO_SECTIONS, fetc
   const [selectedRow, setSelectedRow] = useState(null);
 
   useEffect(() => {
-    load();
+    getAllAttendance();
   }, [date]);
 
   const load = async () => {
     setLoading(true);
     setError("");
     try {
-      const data = fetchStatus ? await fetchStatus(date) : demoFetchStatus(date);
+       const data = fetchStatus
+          ? await fetchStatus(date)
+          : demoFetchStatus(date);
+      console.log("Data that need to render", data);
       setRows(data);
     } catch (err) {
       setError(err.message || "Failed to load attendance status. Please try again.");
@@ -190,6 +195,25 @@ export default function SectionAttendanceStatus({ sections = DEMO_SECTIONS, fetc
       setLoading(false);
     }
   };
+
+    const getAllAttendance = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const params = {
+          date: date,
+        };
+        const { data } = await fetchStatus(params);
+        console.log("Data that need to render", data?.content);
+        setRows(data?.content);
+      } catch (err) {
+        setError(
+          err.message || "Failed to load attendance status. Please try again.",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const markedCount = rows.filter((r) => r.marked).length;
   const totalPresent = rows.reduce((a, r) => a + (r.present || 0), 0);
@@ -256,7 +280,7 @@ export default function SectionAttendanceStatus({ sections = DEMO_SECTIONS, fetc
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {rows.map((row) => (
-              <SectionCard key={row.sectionId} row={row} onView={setSelectedRow} />
+              <SectionCard key={row.sectionId} row={row} onView={setSelectedRow} handleTabChange={tabChange} />
             ))}
           </div>
         )}

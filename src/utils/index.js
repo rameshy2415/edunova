@@ -27,6 +27,57 @@ export function todayISO() {
   return new Date().toISOString().split("T")[0];
 }
 
+
+//Sample O/P ->  Friday, 10 July 2026, 05:22 PM
+export const formatDateTimeDay = (dateTime) => {
+  if (!dateTime) return "-";
+
+  const date = new Date(dateTime);
+
+  if (isNaN(date.getTime())) return "-";
+
+  const datePart = new Intl.DateTimeFormat("en-IN", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+
+  const timePart = new Intl.DateTimeFormat("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  })
+    .format(date)
+    .replace(/\bam\b/i, "AM")
+    .replace(/\bpm\b/i, "PM");
+
+  return `${datePart}, ${timePart}`;
+};
+
+export const formatDayAndTime = (dateTime) => {
+  if (!dateTime) return "-";
+
+  const date = new Date(dateTime);
+
+  if (isNaN(date.getTime())) return "-";
+
+  const day = new Intl.DateTimeFormat("en-IN", {
+    weekday: "long",
+  }).format(date);
+
+  const time = new Intl.DateTimeFormat("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  })
+    .format(date)
+    .replace(/\bam\b/i, "AM")
+    .replace(/\bpm\b/i, "PM");
+
+  return `${day}, ${time}`;
+};
+
 /* ── Currency ────────────────────────────────────────────── */
 export function formatINR(amount) {
   if (amount === null || amount === undefined) return "—";

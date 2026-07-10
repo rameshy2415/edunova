@@ -35,6 +35,10 @@ export const studentsApi = {
   /** GET /students/:id/attendance?month=4&year=2026 */
   getAttendance: (id, params) => axiosInstance.get(`/admin/students/${id}/attendance`, { params }),
 
+  /** GET /students/:id/attendance?month=4&year=2026 */
+  getAttendanceStatus: (params) => axiosInstance.get('/admin/attendance/status', { params }),
+  //getAllAttendance: (sectionId, params) => axiosInstance.get(`/admin/attendance/section/${sectionId}`, { params }),
+
   /** POST /students/attendance/bulk — Teacher marks whole class */
   markBulkAttendance: (payload) => axiosInstance.post("/admin/attendance/mark", payload),
 
