@@ -13,7 +13,6 @@ const NAV_CONFIG = {
         { label: "Students",     path: "/admin/students",   icon: "students" },
         { label: "Timetable",    path: "/admin/timetable",  icon: "timetable" },
         { label: "Attendance",   path: "/admin/attendance", icon: "attendance" },
-        { label: "View Attendance",   path: "/admin/view-attendance", icon: "attendance" },
         { label: "Exams & Grades", path: "/admin/exams-grades",  icon: "exams" },
       ],
     },
