@@ -78,6 +78,16 @@ export const formatDayAndTime = (dateTime) => {
   return `${day}, ${time}`;
 };
 
+export const getCurrentAcademicYear = () => {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth(); // Jan = 0, Apr = 3
+
+  return month >= 3
+    ? `${year}-${year + 1}`
+    : `${year - 1}-${year}`;
+};
+
 /* ── Currency ────────────────────────────────────────────── */
 export function formatINR(amount) {
   if (amount === null || amount === undefined) return "—";

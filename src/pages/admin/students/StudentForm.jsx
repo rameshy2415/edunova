@@ -356,7 +356,7 @@ export default function StudentForm() {
                 <input
                   type="text"
                   value={form.dateOfBirth}
-                  placeholder="14 Aug 2010"
+                  placeholder="YYYY-MM-DD"
                   onChange={(e) => set("dateOfBirth", e.target.value)}
                   className={inputCls("dateOfBirth")}
                 />

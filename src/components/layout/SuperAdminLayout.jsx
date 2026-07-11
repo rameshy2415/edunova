@@ -8,7 +8,7 @@ const NAV = [
     items: [
       { label: "Dashboard",     path: "/superadmin/dashboard",      icon: "grid" },
       { label: "Schools",       path: "/superadmin/schools",         icon: "school", badge: null },
-      { label: "Onboard School",path: "/superadmin/schools/new",    icon: "plus" },
+      /* { label: "Onboard School",path: "/superadmin/schools/new",    icon: "plus" }, */
     ],
   },
   {

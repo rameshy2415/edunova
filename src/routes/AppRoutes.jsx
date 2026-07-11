@@ -19,20 +19,20 @@ import UnauthorizedPage from "../pages/auth/UnauthorizedPage";
 import SuperAdminDashboard from "../pages/superadmin/SuperAdminDashboard";
 import SchoolsList         from "../pages/superadmin/SchoolsList";
 import SchoolDetail        from "../pages/superadmin/SchoolDetail";
-import OnboardSchoolForm   from "../pages/superadmin/OnboardSchoolForm";
+import SchoolForm   from "../pages/superadmin/SchoolForm";
 import {
   SubscriptionsPage,
-  AdminsPage,
   AnalyticsPage,
   SASettingsPage,
   AuditLogsPage,
 } from "../pages/superadmin/SAPages";
+import AdminsPage from "../pages/superadmin/AdminsPage";
+import AdminForm from "../pages/superadmin/AdminForm";
+import AdminDetail from "../pages/superadmin/AdminDetail"
 
 // ── Admin pages ────────────────────────────────────────────────────────────
 import AdminDashboard    from "../pages/admin/AdminDashboard";
-//import StudentsCRUDPage  from "../pages/admin/StudentsCRUDPage";
 import StudentsPage      from "../pages/admin/StudentsPage";
-//import TeachersCRUDPage  from "../pages/admin/TeachersCRUDPage";
 import TeachersPage      from "../pages/admin/TeachersPage";
 import ExamsGradesPage   from "../pages/admin/ExamsGradesPage";
 import FeesPage          from "../pages/admin/FeesPage";
@@ -140,13 +140,16 @@ export default function AppRoutes() {
 
         {/* Schools management */}
         <Route path="schools" element={<SchoolsList />} />
-        <Route path="schools/new" element={<OnboardSchoolForm />} />
+        <Route path="schools/new" element={<SchoolForm />} />
         <Route path="schools/:id" element={<SchoolDetail />} />
         <Route path="schools/:id/edit" element={<SchoolDetail />} />
 
         {/* Other SA modules */}
         <Route path="subscriptions" element={<SubscriptionsPage />} />
         <Route path="admins" element={<AdminsPage />} />
+        <Route path="admins/new" element={<AdminForm />} />
+        <Route path="admins/:id" element={<AdminDetail />} />
+        <Route path="admins/:id/edit" element={<AdminForm />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="settings" element={<SASettingsPage />} />
         <Route path="audit" element={<AuditLogsPage />} />

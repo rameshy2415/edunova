@@ -7,6 +7,7 @@ import {
   PageHeader, StatCard, Card, CardHeader,
   Badge, FullPageSpinner, Alert,
 } from "../../components/common";
+import { getCurrentAcademicYear } from "../../utils/index"
 
 const STATS = [
   { label: "Total students",      value: "1,284", change: "34 this year",      up: true,  colorClass: "bg-cobalt-light text-cobalt" },
@@ -61,7 +62,7 @@ export default function AdminDashboard() {
     <div className="space-y-5">
       <PageHeader
         title="Dashboard"
-        subtitle={`${today} · Academic Year 2025–26`}
+        subtitle={`${today} · Academic Year ${getCurrentAcademicYear()}`}
         actions={
           <button
             onClick={() => navigate("/admin/students/new")}

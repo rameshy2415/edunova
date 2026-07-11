@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
-import {
-  Badge,
-  Button,
-  EmptyState,
-  Spinner,
-} from "../../components/common";
+import { Badge, Button, EmptyState, Spinner } from "../../components/common";
 import { superAdminApi } from "../../api/Superadminapi";
 
 const SCHOOLS = {
@@ -101,10 +96,8 @@ const TYPE_COLOR = {
 export default function SchoolDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-/*   const location = window.location.pathname;
-  const isEditMode = location.includes("/edit"); */
 
-  const location = useLocation();  // React Router hook
+  const location = useLocation(); // React Router hook
   const isEditMode = location.pathname.includes("/edit");
 
   const [tab, setTab] = useState("Overview");
@@ -122,6 +115,12 @@ export default function SchoolDetail() {
     getSchoolDetails();
   }, [id]);
 
+  useEffect(() => {
+    if (isEditMode && school) {
+      setEditData({ ...school });
+    }
+  }, [isEditMode, school]);
+
   const getSchoolDetails = async () => {
     setLoading(true);
     try {
@@ -137,9 +136,9 @@ export default function SchoolDetail() {
         },
       };
       setSchool(schoolData);
-      if (isEditMode) {
+      /* if (isEditMode) {
         setEditData({ ...schoolData });
-      }
+      } */
     } catch (err) {
       console.log(err);
       setError(
@@ -292,8 +291,18 @@ export default function SchoolDetail() {
         {/* Success Message */}
         {saveSuccess && (
           <div className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-3 rounded-xl text-sm border border-green-200">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
             Changes saved successfully! Redirecting...
           </div>
@@ -329,7 +338,9 @@ export default function SchoolDetail() {
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="font-serif text-2xl text-white">{editData.name}</h1>
+              <h1 className="font-serif text-2xl text-white">
+                {editData.name}
+              </h1>
               <p className="text-purple-200 text-sm mt-0.5">
                 {editData.city}, {editData.state} · {editData.board} · Est.{" "}
                 {editData.establishedYear}
@@ -449,7 +460,9 @@ export default function SchoolDetail() {
                   <input
                     type="url"
                     value={editData.website}
-                    onChange={(e) => handleEditChange("website", e.target.value)}
+                    onChange={(e) =>
+                      handleEditChange("website", e.target.value)
+                    }
                     className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     style={{ borderColor: "#e8e4f5" }}
                   />
@@ -496,7 +509,10 @@ export default function SchoolDetail() {
                     type="number"
                     value={editData.establishedYear}
                     onChange={(e) =>
-                      handleEditChange("establishedYear", parseInt(e.target.value))
+                      handleEditChange(
+                        "establishedYear",
+                        parseInt(e.target.value),
+                      )
                     }
                     className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     style={{ borderColor: "#e8e4f5" }}
@@ -512,7 +528,9 @@ export default function SchoolDetail() {
                 <input
                   type="text"
                   value={editData.affiliationNo}
-                  onChange={(e) => handleEditChange("affiliationNo", e.target.value)}
+                  onChange={(e) =>
+                    handleEditChange("affiliationNo", e.target.value)
+                  }
                   className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   style={{ borderColor: "#e8e4f5" }}
                 />
@@ -624,9 +642,13 @@ export default function SchoolDetail() {
               </div>
             </div>
 
-            <div className="mt-4 p-3 bg-purple-50 rounded-lg border" style={{ borderColor: "#e8e4f5" }}>
+            <div
+              className="mt-4 p-3 bg-purple-50 rounded-lg border"
+              style={{ borderColor: "#e8e4f5" }}
+            >
               <p className="text-xs text-purple-600">
-                <strong>Note:</strong> Admin account creation date and last login info cannot be edited here.
+                <strong>Note:</strong> Admin account creation date and last
+                login info cannot be edited here.
               </p>
             </div>
           </div>
@@ -913,7 +935,8 @@ export default function SchoolDetail() {
                 </div>
                 <div className="text-sm text-purple-400 mt-0.5">
                   {school.subscription.billingCycle} billing ·{" "}
-                  {school.subscription.plan?.priceAnnually || school.subscription.amount}
+                  {school.subscription.plan?.priceAnnually ||
+                    school.subscription.amount}
                 </div>
               </div>
               <Badge variant={STATUS_V[school.subscription.status]}>
@@ -923,7 +946,11 @@ export default function SchoolDetail() {
             {[
               ["Current plan", school.subscription.plan?.name || school.plan],
               ["Billing cycle", school.subscription.billingCycle],
-              ["Amount", school.subscription.plan?.priceAnnually || school.subscription.amount],
+              [
+                "Amount",
+                school.subscription.plan?.priceAnnually ||
+                  school.subscription.amount,
+              ],
               ["Next billing", school.subscription.nextBilling],
               ["Started on", school.joined],
               [

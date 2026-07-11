@@ -20,7 +20,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { studentsApi } from "../../api/studentsApi";
-import SectionAttendanceStatus from "./SectionAttendanceStatus";
+import AttendanceStatus from "./AttendanceStatus";
 
 //const CLASSES = ["6-A", "6-B", "6-C", "7-A", "7-B", "8-A", "8-B", "9-A", "9-B", "10-A", "10-B", "11-A", "11-B"];
 
@@ -976,7 +976,7 @@ export default function AttendancePage() {
           )}
 
           {view === "status" && (
-            <SectionAttendanceStatus sections={section} fetchStatus={studentsApi.getAttendanceStatus} tabChange={handleTabChange} />
+            <AttendanceStatus sections={section} fetchStatus={studentsApi.getAttendanceStatus} tabChange={handleTabChange} />
           )}
         </Card>
 

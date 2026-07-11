@@ -9,7 +9,8 @@ const NAV_CONFIG = {
       section: "Main",
       items: [
         { label: "Dashboard",    path: "/admin/dashboard",  icon: "dashboard" },
-        { label: "Students",     path: "/admin/students",   icon: "students",  badge: 3 },
+   /*      { label: "Students",     path: "/admin/students",   icon: "students",  badge: 3 }, */
+        { label: "Students",     path: "/admin/students",   icon: "students" },
         { label: "Timetable",    path: "/admin/timetable",  icon: "timetable" },
         { label: "Attendance",   path: "/admin/attendance", icon: "attendance" },
         { label: "View Attendance",   path: "/admin/view-attendance", icon: "attendance" },
