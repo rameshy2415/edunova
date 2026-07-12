@@ -73,6 +73,7 @@ export function AuthProvider({ children }) {
     token,                         // raw JWT
     role: user?.role ?? null,      // "superadmin" | "admin" | "teacher" | "student" | "parent"
     schoolId: user?.schoolId ?? null, // null for superadmin
+    schoolName: user?.schoolName ?? null, // null for superadmin
     academicYearId: user?.academicYearId ?? null, // null for superadmin
     section: user?.section ?? null, // null for superadmin
     isAuthenticated: !!token,

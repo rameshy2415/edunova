@@ -96,7 +96,7 @@ const ROLE_ACCENT = {
 
 /* ── Component ───────────────────────────────────────────── */
 export default function DashboardLayout() {
-  const { user, role, logout } = useAuth();
+  const { user, role, logout, schoolName } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -196,7 +196,7 @@ export default function DashboardLayout() {
             </svg>
           </button>
           <span className={`hidden md:inline-flex text-xs font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full ${ROLE_COLORS[role]}`}>
-            {role} portal
+            {schoolName}{/*  portal */}
           </span>
         </div>
 

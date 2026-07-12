@@ -70,9 +70,9 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [selectedRole, setSelectedRole] = useState("superadmin");
-  const [email, setEmail] = useState("superadmin@edunova.app");
-  const [password, setPassword] = useState("superadmin@edunova.app");
+  //const [selectedRole, setSelectedRole] = useState("superadmin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -98,7 +98,8 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      const user = await login({ email, password, role: selectedRole });
+      /* const user = await login({ email, password, role: selectedRole }); */
+      const user = await login({ email, password });
       navigate(DASHBOARD_MAP[user.role] || "/dashboard", { replace: true });
     } catch (err) {
       setError(err.message || "Invalid credentials. Please try again.");
@@ -107,7 +108,7 @@ export default function LoginPage() {
     }
   };
 
-  const selected = ROLES.find((r) => r.id === selectedRole);
+  //const selected = ROLES.find((r) => r.id === selectedRole);
 
   return (
     <div className="min-h-screen bg-parchment flex items-center justify-center px-4 pt-20 pb-10">
@@ -122,11 +123,11 @@ export default function LoginPage() {
 
         <h1 className="font-serif text-3xl text-ink mb-1">Welcome back</h1>
         <p className="text-sm text-ink/50 mb-7">
-          Select your role and sign in to continue.
+          Please enter your email and password to sign in.
         </p>
 
         {/* Role selector — 5 roles in a grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-6">
+       {/*  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-6">
           {ROLES.map((r) => (
             <button
               key={r.id}
@@ -151,10 +152,10 @@ export default function LoginPage() {
               </div>
             </button>
           ))}
-        </div>
+        </div> */}
 
         {/* Super admin notice */}
-        {selectedRole === "superadmin" && (
+        {/* {selectedRole === "superadmin" && (
           <div className="flex items-center gap-3 px-4 py-3 bg-purple-50 border border-purple-200 rounded-xl mb-5 text-sm text-purple-700">
             <span className="text-lg">🔐</span>
             <span>
@@ -162,7 +163,7 @@ export default function LoginPage() {
               staff should use this role.
             </span>
           </div>
-        )}
+        )} */}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -249,7 +250,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <button
+         {/*  <button
             type="submit"
             disabled={loading}
             className={`w-full font-medium py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 text-sm ${
@@ -257,6 +258,11 @@ export default function LoginPage() {
                 ? "bg-purple-700 hover:bg-purple-800 text-white shadow-purple-200"
                 : "bg-cobalt text-white hover:bg-cobalt/90 shadow-cobalt/20"
             }`}
+          > */}
+           <button
+            type="submit"
+            disabled={loading}
+            className={"w-full font-medium py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 text-sm bg-cobalt text-white hover:bg-cobalt/90 shadow-cobalt/20"}
           >
             {loading ? (
               <>
@@ -282,13 +288,13 @@ export default function LoginPage() {
                 Signing in…
               </>
             ) : (
-              `Sign in as ${selected?.label} →`
+             `Sign in →` /* `Sign in as ${selected?.label} →` */
             )}
           </button>
         </form>
 
         <p className="text-xs text-ink/35 text-center mt-5">
-          Pre-filled demo credentials per role — click Sign in to proceed.
+          Click Sign in to proceed.
         </p>
       </div>
     </div>
